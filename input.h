@@ -1,7 +1,6 @@
 #pragma once
 #include "global.h"
 
-// input.cpp 中实现的命名空间函数
 namespace inputhook {
     void Init(HWND hWindow);
     void Remove(HWND hWindow);

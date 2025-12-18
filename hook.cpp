@@ -9,12 +9,6 @@
 #pragma warning(disable: 6387)
 #pragma warning(pop)
 
-/*
-* 
-* 注意：在 global.h 中 oExecuteCommandLists / oPresent / oResizeBuffers 已经定义为 inline 全局变量
-* 
-*/
-
 void STDMETHODCALLTYPE hkExecuteCommandLists(ID3D12CommandQueue* queue, UINT NumCommandLists, ID3D12CommandList* const* ppCommandLists) {
     if (!g_pd3dCommandQueue && g_AfterFirstPresent && queue) {
         D3D12_COMMAND_QUEUE_DESC desc = queue->GetDesc();
@@ -62,7 +56,6 @@ HRESULT STDMETHODCALLTYPE hkPresent(IDXGISwapChain3* pSwapChain, UINT SyncInterv
         HWND newWindow = desc.OutputWindow;
         GetWindowRect(newWindow, &g_windowRect);
 
-        // 检查窗口是否变化，如果变化需要重新安装窗口钩子
         if (g_mainWindow != newWindow) {
             if (g_mainWindow) {
                 inputhook::Remove(g_mainWindow);
@@ -141,22 +134,23 @@ HRESULT STDMETHODCALLTYPE hkPresent(IDXGISwapChain3* pSwapChain, UINT SyncInterv
             return S_OK;
         }
 
-        InitProcessName();
         ImGui::CreateContext();
         ImGuiIO& io = ImGui::GetIO();
-        io.IniFilename = nullptr; // No ini
+
+        io.IniFilename = nullptr;
         io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
+
         ImGui::StyleColorsDark();
         ImGui_ImplWin32_Init(g_mainWindow);
-        ImGui_ImplDX12_Init(g_pd3dDevice, g_bufferCount, desc.BufferDesc.Format,
-            g_pd3dSrvDescHeap,
-            g_pd3dSrvDescHeap->GetCPUDescriptorHandleForHeapStart(),
-            g_pd3dSrvDescHeap->GetGPUDescriptorHandleForHeapStart());
+        ImGui_ImplDX12_Init(g_pd3dDevice, g_bufferCount, desc.BufferDesc.Format, g_pd3dSrvDescHeap, g_pd3dSrvDescHeap->GetCPUDescriptorHandleForHeapStart(), g_pd3dSrvDescHeap->GetGPUDescriptorHandleForHeapStart());
+
         unsigned char* pixels;
         int width, height;
+
         io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
         rawinputhook::Init();
         cursorhook::Init();
+
         g_Initialized = true;
     }
 
@@ -174,21 +168,27 @@ HRESULT STDMETHODCALLTYPE hkPresent(IDXGISwapChain3* pSwapChain, UINT SyncInterv
 
     frameCtx.CommandAllocator->Reset();
     g_pd3dCommandList->Reset(frameCtx.CommandAllocator, nullptr);
+
     D3D12_RESOURCE_BARRIER barrier = {};
     barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
     barrier.Transition.pResource = frameCtx.Resource;
     barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
     barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
     barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+
     g_pd3dCommandList->ResourceBarrier(1, &barrier);
     g_pd3dCommandList->OMSetRenderTargets(1, &frameCtx.Descriptor, FALSE, nullptr);
+
     ID3D12DescriptorHeap* ppHeaps[] = { g_pd3dSrvDescHeap };
     g_pd3dCommandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
+
     ImGui_ImplDX12_NewFrame();
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
+
     ImGuiIO& io = ImGui::GetIO();
     bool cursorStateChanged = (menu::isOpen != menu::wasOpenLastFrame);
+
     menu::wasOpenLastFrame = menu::isOpen;
     inputhook::UpdateInputBlockState();
     cursorhook::UpdateCursorState();
@@ -218,6 +218,7 @@ HRESULT STDMETHODCALLTYPE hkPresent(IDXGISwapChain3* pSwapChain, UINT SyncInterv
     if (menu::isOpen) {
         static int frameCounter = 0;
         frameCounter++;
+
         if (frameCounter % 30 == 0) {
             RECT rect;
             GetWindowRect(g_mainWindow, &rect);
@@ -228,111 +229,9 @@ HRESULT STDMETHODCALLTYPE hkPresent(IDXGISwapChain3* pSwapChain, UINT SyncInterv
     }
 
     SetupImGui(pSwapChain, SyncInterval, Flags);
-
-    /*
-    if (menu::isOpen) {
-        static bool styleApplied = false;
-        if (!styleApplied) {
-            ImGuiStyle& style = ImGui::GetStyle();
-            ImVec4* colors = style.Colors;
-
-            style.WindowRounding = 12.0f;
-            style.ChildRounding = 8.0f;
-            style.FrameRounding = 8.0f;
-            style.PopupRounding = 8.0f;
-            style.ScrollbarRounding = 12.0f;
-            style.GrabRounding = 8.0f;
-            style.TabRounding = 8.0f;
-            style.WindowBorderSize = 0.0f;
-            style.FrameBorderSize = 0.0f;
-
-            colors[ImGuiCol_WindowBg] = ImVec4(0.10f, 0.10f, 0.13f, 0.94f);
-            colors[ImGuiCol_ChildBg] = ImVec4(0.12f, 0.12f, 0.16f, 0.80f);
-            colors[ImGuiCol_TitleBg] = ImVec4(0.18f, 0.14f, 0.25f, 1.00f);
-            colors[ImGuiCol_TitleBgActive] = ImVec4(0.24f, 0.18f, 0.35f, 1.00f);
-            colors[ImGuiCol_Header] = ImVec4(0.28f, 0.20f, 0.40f, 0.60f);
-            colors[ImGuiCol_HeaderHovered] = ImVec4(0.35f, 0.25f, 0.50f, 0.80f);
-            colors[ImGuiCol_HeaderActive] = ImVec4(0.40f, 0.30f, 0.55f, 1.00f);
-            colors[ImGuiCol_FrameBg] = ImVec4(0.18f, 0.18f, 0.22f, 0.70f);
-            colors[ImGuiCol_FrameBgHovered] = ImVec4(0.30f, 0.25f, 0.45f, 0.80f);
-            colors[ImGuiCol_FrameBgActive] = ImVec4(0.35f, 0.28f, 0.50f, 1.00f);
-            colors[ImGuiCol_CheckMark] = ImVec4(0.60f, 0.45f, 0.90f, 1.00f);
-            colors[ImGuiCol_Text] = ImVec4(0.95f, 0.95f, 1.00f, 1.00f);
-            colors[ImGuiCol_Separator] = ImVec4(0.35f, 0.30f, 0.50f, 0.50f);
-
-            styleApplied = true;
-        }
-
-        ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f), ImGuiCond_FirstUseEver, ImVec2(0.5f, 0.5f));
-        ImGui::SetNextWindowSize(ImVec2(500, 400), ImGuiCond_FirstUseEver);
-        ImGui::SetNextWindowBgAlpha(0.95f);
-
-        ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
-
-        if (ImGui::Begin("Begeerte", nullptr, flags)) {
-            if (ImGui::CollapsingHeader("Aimbot", ImGuiTreeNodeFlags_DefaultOpen)) {
-                ImGui::Indent(10.0f);
-                static bool aimbot_enabled = false;
-                static bool silent_aim = true;
-                static bool fov_check = true;
-
-                ImGui::Checkbox("Enable Aimbot", &aimbot_enabled);
-                ImGui::Checkbox("Silent Aim", &silent_aim);
-                ImGui::Checkbox("FOV Check", &fov_check);
-
-                ImGui::Unindent(10.0f);
-                ImGui::Spacing();
-            }
-
-            if (ImGui::CollapsingHeader("Visuals")) {
-                ImGui::Indent(10.0f);
-                static bool esp_box = true;
-                static bool esp_name = true;
-                static bool esp_health = false;
-                static bool chams = false;
-
-                ImGui::Checkbox("Box ESP", &esp_box);
-                ImGui::Checkbox("Name ESP", &esp_name);
-                ImGui::Checkbox("Health Bar", &esp_health);
-                ImGui::Checkbox("Chams", &chams);
-
-                ImGui::Unindent(10.0f);
-                ImGui::Spacing();
-            }
-
-            if (ImGui::CollapsingHeader("Misc")) {
-                ImGui::Indent(10.0f);
-                static bool bunny_hop = false;
-                static bool no_flash = true;
-                static bool radar = true;
-
-                ImGui::Checkbox("Bunny Hop", &bunny_hop);
-                ImGui::Checkbox("No Flash", &no_flash);
-                ImGui::Checkbox("Radar Hack", &radar);
-
-                ImGui::TextColored(ImVec4(0.65f, 0.60f, 0.90f, 0.7f), "Press F1 to toggle menu");
-
-                ImGui::Unindent(10.0f);
-            }
-
-            float windowHeight = ImGui::GetWindowHeight();
-            float textHeight = ImGui::GetTextLineHeight();
-            ImGui::SetCursorPosY(windowHeight - textHeight - ImGui::GetStyle().WindowPadding.y);
-
-            ImGui::TextColored(ImVec4(0.60f, 0.55f, 0.85f, 0.8f), "github.com/zetsr");
-
-            float versionWidth = ImGui::CalcTextSize("v1.0.0").x;
-            ImGui::SameLine(ImGui::GetWindowWidth() - versionWidth - ImGui::GetStyle().WindowPadding.x);
-            ImGui::TextColored(ImVec4(0.60f, 0.55f, 0.85f, 0.8f), "v1.0.0");
-        }
-
-        ImGui::End();
-    }
-
-    ImGui::GetForegroundDrawList()->AddText(ImVec2(5.0f, 5.0f), IM_COL32(255, 255, 0, 255), "Test Text");
     ImGui::Render();
-    */
     ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), g_pd3dCommandList);
+
     barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
     barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
     g_pd3dCommandList->ResourceBarrier(1, &barrier);
@@ -388,6 +287,7 @@ DWORD WINAPI MainThread(LPVOID) {
         IDXGISwapChain* tempSwapChain = nullptr;
 
         bool ok = SUCCEEDED(D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&tempDevice)));
+
         if (ok) {
             D3D12_COMMAND_QUEUE_DESC qdesc = {};
             qdesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
