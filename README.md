@@ -227,7 +227,9 @@ A: 可以，但需遵守 ImGui、MinHook 等依赖库的许可证要求。
 - [MinHook](https://github.com/TsudaKageyu/minhook) - 轻量级 API Hook 库
 - [Universal-Dear-ImGui-Hook](https://github.com/Sh0ckFR/Universal-Dear-ImGui-Hook) - ImGui Hook 参考实现
 
-> **最后，致谢*Large Language Model*，它帮助我实现了无数个在此之前难以实现的梦想：做更多有用的东西，让更多人使用。**
+> 最后，感谢 *Large Language Model*，它帮助我实现了无数个在此之前难以实现的梦想：
+>
+> **做更多有用的东西，让更多人使用。**
 
 ## 许可证
 
