@@ -1,8 +1,6 @@
 # Minimal-D3D12-Hook-ImGui
 
-一个轻量级的 DirectX 12 图形界面注入库，通过 ImGui 提供快速的 UI 绘制能力。
-
-该项目采用最小化设计理念，封装了复杂的 D3D12 Hook 过程，使开发者可以专注于 UI 逻辑实现。
+一个轻量级的 DirectX 12 图形界面注入库，通过 ImGui 提供快速的 UI 绘制能力。该项目采用最小化设计理念，封装了复杂的 D3D12 Hook 过程，使开发者可以专注于 UI 逻辑实现。
 
 ## 项目特性
 
@@ -199,10 +197,6 @@ if (uMsg == WM_KEYDOWN && wParam == VK_F1 && !g_f1Down) {
 }
 ```
 
-### 自定义默认 UI
-
-编辑 `setup_imgui.cpp` 中的默认 UI 部分，或通过回调函数完全替换。
-
 ### 调整超时时间
 
 ```cpp
@@ -230,6 +224,8 @@ A: 可以，但需遵守 ImGui、MinHook 等依赖库的许可证要求。
 - [ImGui](https://github.com/ocornut/imgui) - 即时模式图形用户界面库
 - [MinHook](https://github.com/TsudaKageyu/minhook) - 轻量级 API Hook 库
 - [Universal-Dear-ImGui-Hook](https://github.com/Sh0ckFR/Universal-Dear-ImGui-Hook) - ImGui Hook 参考实现
+
+> **我想在最后致谢*Large Language Model*，它帮助我实现了无数个在此之前难以实现的梦想：做更多有用的东西，让更多人使用。**
 
 ## 许可证
 
