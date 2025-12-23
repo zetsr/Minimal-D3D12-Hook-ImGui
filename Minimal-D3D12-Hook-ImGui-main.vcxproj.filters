@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ImGui">
+      <UniqueIdentifier>{7ff4ae78-cef1-4d82-a968-54bfcc0b7eec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MinHook">
+      <UniqueIdentifier>{5028b4a0-6bc5-42c6-a2ac-99d0040b7242}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main">
+      <UniqueIdentifier>{87af0a0c-3a68-428d-b49c-00a3e78d8e55}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="MinHook\libMinHook.x64.lib">
+      <Filter>MinHook</Filter>
+    </Library>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MinHook\MinHook.h">
+      <Filter>MinHook</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imconfig.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imgui.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imgui_impl_dx12.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imgui_impl_win32.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imgui_internal.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imstb_rectpack.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imstb_textedit.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imstb_truetype.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Main\mdx12_api.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ImGui\imgui.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_demo.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_draw.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_impl_dx12.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_impl_win32.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_tables.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_widgets.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Main\dllmain.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="Main\hook.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="Main\input.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="Main\render.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="Main\mdx12_globals.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="Main\setup_imgui.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
