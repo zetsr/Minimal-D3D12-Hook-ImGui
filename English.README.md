@@ -44,15 +44,14 @@ void MyImGuiDraw(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags)
     if (g_MDX12::g_MenuState::g_isOpen) {
         ImGui::SetNextWindowPos(ImVec2(100, 100), ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowSize(ImVec2(400, 300), ImGuiCond_FirstUseEver);
-        
+
         if (ImGui::Begin("My Menu")) {
             ImGui::Text("Hello World!");
-            
+
             static bool option = false;
             ImGui::Checkbox("My Option", &option);
-            
-            ImGui::End();
         }
+        ImGui::End();
     }
 }
 
