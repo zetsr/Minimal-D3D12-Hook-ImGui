@@ -126,14 +126,27 @@ namespace g_MDX12 {
                 return S_OK;
             }
 
-            ImGui::CreateContext();
-            ImGuiIO& io = ImGui::GetIO();
+            // ---------------------------------------------------------
+            // [FIX BEGIN] 修复 ImGui 风格在 Resize 时被重置的问题
+            // 逻辑：只有当 ImGui 上下文不存在时（第一次运行），才创建上下文和应用默认风格。
+            // ---------------------------------------------------------
+            if (!ImGui::GetCurrentContext()) {
+                ImGui::CreateContext();
 
+                // 下面这行代码就是罪魁祸首，只有首次初始化才跑它
+                ImGui::StyleColorsDark();
+
+                ImGui_ImplWin32_Init(g_ProcessWindow::g_mainWindow);
+            }
+            // ---------------------------------------------------------
+            // [FIX END]
+            // ---------------------------------------------------------
+
+            ImGuiIO& io = ImGui::GetIO();
             io.IniFilename = nullptr;
             io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
 
-            ImGui::StyleColorsDark();
-            ImGui_ImplWin32_Init(g_ProcessWindow::g_mainWindow);
+            // DX12 后端必须重新初始化，因为 resize 可能会让之前的 backend 对象失效
             ImGui_ImplDX12_Init(g_D3D12Resources::g_pd3dDevice, g_D3D12Resources::g_bufferCount, desc.BufferDesc.Format, g_D3D12Resources::g_pd3dSrvDescHeap, g_D3D12Resources::g_pd3dSrvDescHeap->GetCPUDescriptorHandleForHeapStart(), g_D3D12Resources::g_pd3dSrvDescHeap->GetGPUDescriptorHandleForHeapStart());
 
             unsigned char* pixels;
