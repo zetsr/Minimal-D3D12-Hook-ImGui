@@ -44,15 +44,15 @@ void MyImGuiDraw(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags)
     if (g_MDX12::g_MenuState::g_isOpen) {
         ImGui::SetNextWindowPos(ImVec2(100, 100), ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowSize(ImVec2(400, 300), ImGuiCond_FirstUseEver);
-        
+
+        // 注意：即使 Begin 返回 false（窗口被折叠），你依然需要调用 End()
         if (ImGui::Begin("My Menu")) {
             ImGui::Text("Hello World!");
-            
+
             static bool option = false;
             ImGui::Checkbox("My Option", &option);
-            
-            ImGui::End();
         }
+        ImGui::End();
     }
 }
 
