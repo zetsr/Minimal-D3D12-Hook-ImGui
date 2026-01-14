@@ -37,6 +37,14 @@ Write your code in `dllmain.cpp`:
 ```cpp
 #include "mdx12_api.h"
 
+extern "C" {
+#include "../MinHook/src/buffer.c"
+#include "../MinHook/src/hook.c"
+#include "../MinHook/src/trampoline.c"
+#include "../MinHook/src/hde/hde32.c"
+#include "../MinHook/src/hde/hde64.c"
+}
+
 // Define your custom ImGui drawing function
 void MyImGuiDraw(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags)
 {
