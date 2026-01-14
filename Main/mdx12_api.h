@@ -18,7 +18,7 @@
 #include "../ImGui/imgui.h"
 #include "../ImGui/imgui_impl_win32.h"
 #include "../ImGui/imgui_impl_dx12.h"
-#include "../MinHook/MinHook.h"
+#include "../MinHook/include/MinHook.h"
 #pragma warning(pop)
 
 #pragma comment(lib, "d3d12.lib")

@@ -19,9 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <Library Include="MinHook\libMinHook.x64.lib" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h" />
     <ClInclude Include="ImGui\imgui.h" />
     <ClInclude Include="ImGui\imgui_impl_dx12.h" />
@@ -31,7 +28,7 @@
     <ClInclude Include="ImGui\imstb_textedit.h" />
     <ClInclude Include="ImGui\imstb_truetype.h" />
     <ClInclude Include="Main\mdx12_api.h" />
-    <ClInclude Include="MinHook\MinHook.h" />
+    <ClInclude Include="MinHook\include\MinHook.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ImGui\imgui.cpp" />

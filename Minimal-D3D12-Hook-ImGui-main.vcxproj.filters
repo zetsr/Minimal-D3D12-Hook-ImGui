@@ -10,16 +10,11 @@
     <Filter Include="Main">
       <UniqueIdentifier>{87af0a0c-3a68-428d-b49c-00a3e78d8e55}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MinHook\include">
+      <UniqueIdentifier>{7045de8d-8567-4cf9-9c96-88ad38f53f6a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Library Include="MinHook\libMinHook.x64.lib">
-      <Filter>MinHook</Filter>
-    </Library>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="MinHook\MinHook.h">
-      <Filter>MinHook</Filter>
-    </ClInclude>
     <ClInclude Include="ImGui\imconfig.h">
       <Filter>ImGui</Filter>
     </ClInclude>
@@ -46,6 +41,9 @@
     </ClInclude>
     <ClInclude Include="Main\mdx12_api.h">
       <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="MinHook\include\MinHook.h">
+      <Filter>MinHook\include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
