@@ -18,10 +18,14 @@ void MyImGuiDraw(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags)
 
         // 注意：即使 Begin 返回 false（窗口被折叠），你依然需要调用 End()
         if (ImGui::Begin("My Menu")) {
+            ImGui::PushFont(g_MDX12::g_Alibaba_PuHuiTi_Heavy);
+
             ImGui::Text("Hello World!");
 
             static bool option = false;
             ImGui::Checkbox("My Option", &option);
+
+            ImGui::PopFont();
         }
         ImGui::End();
     }

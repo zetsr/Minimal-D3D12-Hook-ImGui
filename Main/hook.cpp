@@ -1,5 +1,11 @@
 #include "mdx12_api.h"
 
+#include "../Font/Alibaba-PuHuiTi-Bold.h"
+#include "../Font/Alibaba-PuHuiTi-Heavy.h"
+#include "../Font/Alibaba-PuHuiTi-Light.h"
+#include "../Font/Alibaba-PuHuiTi-Medium.h"
+#include "../Font/Alibaba-PuHuiTi-Regular.h"
+
 #pragma warning(push)
 #pragma warning(disable: 26451)
 #pragma warning(disable: 26812)
@@ -145,6 +151,22 @@ namespace g_MDX12 {
             ImGuiIO& io = ImGui::GetIO();
             io.IniFilename = nullptr;
             io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
+            
+            ImFontAtlas* atlas = io.Fonts;
+            const ImWchar* range = atlas->GetGlyphRangesChineseFull();
+
+            // 默认字体
+            // Alibaba-PuHuiTi-Regular
+            g_MDX12::g_Alibaba_PuHuiTi_Regular = io.Fonts->AddFontFromMemoryTTF(g_Fonts::Alibaba_PuHuiTi_Regular, sizeof(g_Fonts::Alibaba_PuHuiTi_Regular), 18.0f, NULL, range);
+            
+            // Alibaba-PuHuiTi-Bold
+            g_MDX12::g_Alibaba_PuHuiTi_Bold = io.Fonts->AddFontFromMemoryTTF(g_Fonts::Alibaba_PuHuiTi_Bold, sizeof(g_Fonts::Alibaba_PuHuiTi_Bold), 18.0f, NULL, range);
+            // Alibaba-PuHuiTi-Heavy
+            g_MDX12::g_Alibaba_PuHuiTi_Heavy = io.Fonts->AddFontFromMemoryTTF(g_Fonts::Alibaba_PuHuiTi_Heavy, sizeof(g_Fonts::Alibaba_PuHuiTi_Heavy), 18.0f, NULL, range);
+            // Alibaba-PuHuiTi-Light
+            g_MDX12::g_Alibaba_PuHuiTi_Light = io.Fonts->AddFontFromMemoryTTF(g_Fonts::Alibaba_PuHuiTi_Light, sizeof(g_Fonts::Alibaba_PuHuiTi_Light), 18.0f, NULL, range);
+            // Alibaba-PuHuiTi-Medium
+            g_MDX12::g_Alibaba_PuHuiTi_Medium = io.Fonts->AddFontFromMemoryTTF(g_Fonts::Alibaba_PuHuiTi_Medium, sizeof(g_Fonts::Alibaba_PuHuiTi_Medium), 18.0f, NULL, range);
 
             // DX12 后端必须重新初始化，因为 resize 可能会让之前的 backend 对象失效
             ImGui_ImplDX12_Init(g_D3D12Resources::g_pd3dDevice, g_D3D12Resources::g_bufferCount, desc.BufferDesc.Format, g_D3D12Resources::g_pd3dSrvDescHeap, g_D3D12Resources::g_pd3dSrvDescHeap->GetCPUDescriptorHandleForHeapStart(), g_D3D12Resources::g_pd3dSrvDescHeap->GetGPUDescriptorHandleForHeapStart());
