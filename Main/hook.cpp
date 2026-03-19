@@ -1,10 +1,10 @@
 #include "mdx12_api.h"
 
-#include "../Font/Alibaba-PuHuiTi-Bold.h"
-#include "../Font/Alibaba-PuHuiTi-Heavy.h"
-#include "../Font/Alibaba-PuHuiTi-Light.h"
+// #include "../Font/Alibaba-PuHuiTi-Bold.h"
+// #include "../Font/Alibaba-PuHuiTi-Heavy.h"
+// #include "../Font/Alibaba-PuHuiTi-Light.h"
 #include "../Font/Alibaba-PuHuiTi-Medium.h"
-#include "../Font/Alibaba-PuHuiTi-Regular.h"
+// #include "../Font/Alibaba-PuHuiTi-Regular.h"
 
 #pragma warning(push)
 #pragma warning(disable: 26451)
@@ -151,20 +151,20 @@ namespace g_MDX12 {
             ImGuiIO& io = ImGui::GetIO();
             io.IniFilename = nullptr;
             io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
-            
+
             ImFontAtlas* atlas = io.Fonts;
             const ImWchar* range = atlas->GetGlyphRangesChineseFull();
 
             // 默认字体
             // Alibaba-PuHuiTi-Regular
-            g_MDX12::g_Alibaba_PuHuiTi_Regular = io.Fonts->AddFontFromMemoryTTF(g_Fonts::Alibaba_PuHuiTi_Regular, sizeof(g_Fonts::Alibaba_PuHuiTi_Regular), 18.0f, NULL, range);
-            
+            // g_MDX12::g_Alibaba_PuHuiTi_Regular = io.Fonts->AddFontFromMemoryTTF(g_Fonts::Alibaba_PuHuiTi_Regular, sizeof(g_Fonts::Alibaba_PuHuiTi_Regular), 18.0f, NULL, range);
+
             // Alibaba-PuHuiTi-Bold
-            g_MDX12::g_Alibaba_PuHuiTi_Bold = io.Fonts->AddFontFromMemoryTTF(g_Fonts::Alibaba_PuHuiTi_Bold, sizeof(g_Fonts::Alibaba_PuHuiTi_Bold), 18.0f, NULL, range);
+            // g_MDX12::g_Alibaba_PuHuiTi_Bold = io.Fonts->AddFontFromMemoryTTF(g_Fonts::Alibaba_PuHuiTi_Bold, sizeof(g_Fonts::Alibaba_PuHuiTi_Bold), 18.0f, NULL, range);
             // Alibaba-PuHuiTi-Heavy
-            g_MDX12::g_Alibaba_PuHuiTi_Heavy = io.Fonts->AddFontFromMemoryTTF(g_Fonts::Alibaba_PuHuiTi_Heavy, sizeof(g_Fonts::Alibaba_PuHuiTi_Heavy), 18.0f, NULL, range);
+            // g_MDX12::g_Alibaba_PuHuiTi_Heavy = io.Fonts->AddFontFromMemoryTTF(g_Fonts::Alibaba_PuHuiTi_Heavy, sizeof(g_Fonts::Alibaba_PuHuiTi_Heavy), 18.0f, NULL, range);
             // Alibaba-PuHuiTi-Light
-            g_MDX12::g_Alibaba_PuHuiTi_Light = io.Fonts->AddFontFromMemoryTTF(g_Fonts::Alibaba_PuHuiTi_Light, sizeof(g_Fonts::Alibaba_PuHuiTi_Light), 18.0f, NULL, range);
+            // g_MDX12::g_Alibaba_PuHuiTi_Light = io.Fonts->AddFontFromMemoryTTF(g_Fonts::Alibaba_PuHuiTi_Light, sizeof(g_Fonts::Alibaba_PuHuiTi_Light), 18.0f, NULL, range);
             // Alibaba-PuHuiTi-Medium
             g_MDX12::g_Alibaba_PuHuiTi_Medium = io.Fonts->AddFontFromMemoryTTF(g_Fonts::Alibaba_PuHuiTi_Medium, sizeof(g_Fonts::Alibaba_PuHuiTi_Medium), 18.0f, NULL, range);
 
@@ -303,17 +303,32 @@ namespace g_MDX12 {
 
     DWORD WINAPI MainThread(LPVOID) {
         if (MH_Initialize() != MH_OK) return 0;
+
+        // ---------------------------------------------------------------
+        // [关键修复] 等待目标进程自然加载 d3d12.dll 与 dxgi.dll
+        // 使用 GetModuleHandleA 而非 LoadLibraryA：
+        //   - GetModuleHandleA 只查询已加载的模块，不会强制加载
+        //   - LoadLibraryA 在进程尚未准备好时强制加载可能引发崩溃
+        // ---------------------------------------------------------------
+        if (!g_RuntimeModules::WaitAndLoad()) {
+            // WaitAndLoad 目前是死循环直到成功，不会返回 false，此处作为保险
+            return 0;
+        }
+
+        // 此时 d3d12.dll 与 dxgi.dll 已被目标进程加载，可以安全操作
         while (true) {
             WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, DefWindowProcW, 0, 0, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr, L"TempDX12", nullptr };
             RegisterClassEx(&wc);
             HWND tempWnd = CreateWindow(wc.lpszClassName, L"Temp", WS_OVERLAPPEDWINDOW, 0, 0, 100, 100, nullptr, nullptr, wc.hInstance, nullptr);
             if (!tempWnd) { UnregisterClass(wc.lpszClassName, wc.hInstance); Sleep(1); continue; }
+
             ID3D12Device* tempDevice = nullptr;
             ID3D12CommandQueue* tempQueue = nullptr;
             IDXGIFactory4* factory = nullptr;
             IDXGISwapChain* tempSwapChain = nullptr;
 
-            bool ok = SUCCEEDED(D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&tempDevice)));
+            // 使用运行时加载的函数指针，而非编译期链接的符号
+            bool ok = SUCCEEDED(g_RuntimeModules::g_pD3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&tempDevice)));
 
             if (ok) {
                 D3D12_COMMAND_QUEUE_DESC qdesc = {};
@@ -325,7 +340,8 @@ namespace g_MDX12 {
             }
 
             if (ok) {
-                ok = SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&factory)));
+                // 使用运行时加载的函数指针
+                ok = SUCCEEDED(g_RuntimeModules::g_pCreateDXGIFactory1(IID_PPV_ARGS(&factory)));
             }
 
             if (ok) {

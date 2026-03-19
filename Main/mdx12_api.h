@@ -22,19 +22,24 @@
 #include "../MinHook/include/MinHook.h"
 #pragma warning(pop)
 
-#pragma comment(lib, "d3d12.lib")
-#pragma comment(lib, "dxgi.lib")
-#pragma comment(lib, "user32.lib")
+// *** 静态链接已移至 mdx12_libs.cpp ***
+// 此处不再写 #pragma comment(lib, ...) 
+// imgui_impl_dx12 所需的链接由 mdx12_libs.cpp 统一提供
+// 我们自己的 hook 逻辑通过 g_RuntimeModules::WaitAndLoad() 运行时加载，避免注入过早崩溃
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+// 运行时动态加载的D3D12/DXGI函数指针类型
+typedef HRESULT(WINAPI* PFN_D3D12CreateDevice)(IUnknown*, D3D_FEATURE_LEVEL, REFIID, void**);
+typedef HRESULT(WINAPI* PFN_CreateDXGIFactory1)(REFIID, void**);
 
 // Main namespace for all globals
 namespace g_MDX12 {
     // Fonts
-    extern ImFont* g_Alibaba_PuHuiTi_Regular;
-    extern ImFont* g_Alibaba_PuHuiTi_Bold;
-    extern ImFont* g_Alibaba_PuHuiTi_Heavy;
-    extern ImFont* g_Alibaba_PuHuiTi_Light;
+    // extern ImFont* g_Alibaba_PuHuiTi_Regular;
+    // extern ImFont* g_Alibaba_PuHuiTi_Bold;
+    // extern ImFont* g_Alibaba_PuHuiTi_Heavy;
+    // extern ImFont* g_Alibaba_PuHuiTi_Light;
     extern ImFont* g_Alibaba_PuHuiTi_Medium;
 
     // Hook function pointer types
@@ -65,6 +70,18 @@ namespace g_MDX12 {
         extern PFN_GetClipCursor g_oGetClipCursor;
         extern PFN_ClipCursor g_oClipCursor;
         extern PFN_GetMouseMovePointsEx g_oGetMouseMovePointsEx;
+    }
+
+    // 运行时动态加载的模块与函数指针
+    // 用于在 MainThread 中安全地等待目标进程加载 d3d12.dll/dxgi.dll 后再操作
+    namespace g_RuntimeModules {
+        extern HMODULE g_hD3D12;
+        extern HMODULE g_hDXGI;
+        extern PFN_D3D12CreateDevice g_pD3D12CreateDevice;
+        extern PFN_CreateDXGIFactory1 g_pCreateDXGIFactory1;
+
+        // 阻塞直到模块就绪，由 MainThread 在最开始调用
+        bool WaitAndLoad();
     }
 
     // Direct3D 12 resources namespace

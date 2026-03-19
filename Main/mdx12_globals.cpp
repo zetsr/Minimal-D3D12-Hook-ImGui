@@ -2,10 +2,10 @@
 
 namespace g_MDX12 {
     // Fonts
-    ImFont* g_Alibaba_PuHuiTi_Regular = nullptr;
-    ImFont* g_Alibaba_PuHuiTi_Bold = nullptr;
-    ImFont* g_Alibaba_PuHuiTi_Heavy = nullptr;
-    ImFont* g_Alibaba_PuHuiTi_Light = nullptr;
+    // ImFont* g_Alibaba_PuHuiTi_Regular = nullptr;
+    // ImFont* g_Alibaba_PuHuiTi_Bold = nullptr;
+    // ImFont* g_Alibaba_PuHuiTi_Heavy = nullptr;
+    // ImFont* g_Alibaba_PuHuiTi_Light = nullptr;
     ImFont* g_Alibaba_PuHuiTi_Medium = nullptr;
 
     // Hook original function pointers
@@ -22,6 +22,40 @@ namespace g_MDX12 {
         PFN_GetClipCursor g_oGetClipCursor = nullptr;
         PFN_ClipCursor g_oClipCursor = nullptr;
         PFN_GetMouseMovePointsEx g_oGetMouseMovePointsEx = nullptr;
+    }
+
+    // 运行时模块加载
+    namespace g_RuntimeModules {
+        HMODULE g_hD3D12 = nullptr;
+        HMODULE g_hDXGI = nullptr;
+        PFN_D3D12CreateDevice g_pD3D12CreateDevice = nullptr;
+        PFN_CreateDXGIFactory1 g_pCreateDXGIFactory1 = nullptr;
+
+        // 使用 GetModuleHandleA 轮询，等待目标进程自然加载模块
+        // 绝对不用 LoadLibraryA，避免在模块未就绪时强制加载导致崩溃
+        bool WaitAndLoad() {
+            while (true) {
+                if (!g_hD3D12) {
+                    g_hD3D12 = GetModuleHandleA("d3d12.dll");
+                }
+                if (!g_hDXGI) {
+                    g_hDXGI = GetModuleHandleA("dxgi.dll");
+                }
+
+                if (g_hD3D12 && g_hDXGI) {
+                    g_pD3D12CreateDevice = reinterpret_cast<PFN_D3D12CreateDevice>(
+                        GetProcAddress(g_hD3D12, "D3D12CreateDevice"));
+                    g_pCreateDXGIFactory1 = reinterpret_cast<PFN_CreateDXGIFactory1>(
+                        GetProcAddress(g_hDXGI, "CreateDXGIFactory1"));
+
+                    if (g_pD3D12CreateDevice && g_pCreateDXGIFactory1) {
+                        return true;
+                    }
+                }
+
+                Sleep(10);
+            }
+        }
     }
 
     // Direct3D 12 resources

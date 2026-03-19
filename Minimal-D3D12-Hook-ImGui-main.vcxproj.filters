@@ -42,26 +42,14 @@
     <ClInclude Include="ImGui\imstb_truetype.h">
       <Filter>ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="Main\mdx12_api.h">
-      <Filter>Main</Filter>
-    </ClInclude>
     <ClInclude Include="MinHook\include\MinHook.h">
       <Filter>MinHook\include</Filter>
     </ClInclude>
-    <ClInclude Include="Font\Alibaba-PuHuiTi-Regular.h">
-      <Filter>Font</Filter>
-    </ClInclude>
-    <ClInclude Include="Font\Alibaba-PuHuiTi-Bold.h">
-      <Filter>Font</Filter>
-    </ClInclude>
-    <ClInclude Include="Font\Alibaba-PuHuiTi-Heavy.h">
-      <Filter>Font</Filter>
-    </ClInclude>
-    <ClInclude Include="Font\Alibaba-PuHuiTi-Light.h">
-      <Filter>Font</Filter>
-    </ClInclude>
     <ClInclude Include="Font\Alibaba-PuHuiTi-Medium.h">
       <Filter>Font</Filter>
+    </ClInclude>
+    <ClInclude Include="Main\mdx12_api.h">
+      <Filter>Main</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -98,10 +86,13 @@
     <ClCompile Include="Main\render.cpp">
       <Filter>Main</Filter>
     </ClCompile>
-    <ClCompile Include="Main\mdx12_globals.cpp">
+    <ClCompile Include="Main\setup_imgui.cpp">
       <Filter>Main</Filter>
     </ClCompile>
-    <ClCompile Include="Main\setup_imgui.cpp">
+    <ClCompile Include="Main\mdx12_libs.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="Main\mdx12_globals.cpp">
       <Filter>Main</Filter>
     </ClCompile>
   </ItemGroup>
