@@ -27,15 +27,20 @@ void MyImGuiDraw(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags)
     }
 }
 
+void init(LPVOID lpParam) {
+    g_MDX12::Initialize(lpParam);
+    g_MDX12::SetSetupImGuiCallback(MyImGuiDraw);
+}
+
+void MainThread(LPVOID lpParam) {
+    init(lpParam);
+}
+
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
     switch (ul_reason_for_call) {
     case DLL_PROCESS_ATTACH:
-        // 初始化 Hook 系统
-        g_MDX12::Initialize();
-
-        // 设置自定义绘制回调
-        g_MDX12::SetSetupImGuiCallback(MyImGuiDraw);
+        if (HANDLE h = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)MainThread, hModule, 0, nullptr)) CloseHandle(h);
         break;
 
     case DLL_PROCESS_DETACH:

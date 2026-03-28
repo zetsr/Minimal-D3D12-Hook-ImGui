@@ -173,7 +173,7 @@ namespace g_MDX12 {
     }
 
     // Public API
-    void Initialize();
+    void Initialize(LPVOID lpParam);
     void SetSetupImGuiCallback(SetupImGuiCallback callback);
 }
 

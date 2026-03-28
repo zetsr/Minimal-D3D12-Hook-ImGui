@@ -335,7 +335,7 @@ namespace g_MDX12 {
                 }
             }
 
-            if (g_MenuState::g_isOpen) {
+            if (g_MenuState::g_isOpen && ImGui::GetCurrentContext() != nullptr) {
                 ImGui_ImplWin32_WndProcHandler(hwnd, uMsg, wParam, lParam);
                 ImGuiIO& io = ImGui::GetIO();
 

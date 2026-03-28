@@ -301,7 +301,7 @@ namespace g_MDX12 {
         return hr;
     }
 
-    DWORD WINAPI MainThread(LPVOID) {
+    DWORD WINAPI MainThread(LPVOID lpParam) {
         if (MH_Initialize() != MH_OK) return 0;
 
         // ---------------------------------------------------------------
