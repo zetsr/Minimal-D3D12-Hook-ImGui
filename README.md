@@ -35,7 +35,7 @@
 在 `dllmain.cpp` 中编写你的代码：
 
 ```cpp
-#include "mdx12_api.h"
+﻿#include "mdx12_api.h"
 
 extern "C" {
 #include "../MinHook/src/buffer.c"
@@ -45,7 +45,7 @@ extern "C" {
 #include "../MinHook/src/hde/hde64.c"
 }
 
-// 定义自定义 ImGui 绘制函数
+/// 定义自定义 ImGui 绘制函数
 void MyImGuiDraw(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags)
 {
     // 检查菜单是否打开（按 F1 切换）
@@ -64,17 +64,22 @@ void MyImGuiDraw(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags)
     }
 }
 
+void init(LPVOID lpParam) {
+    g_MDX12::Initialize(lpParam);
+    g_MDX12::SetSetupImGuiCallback(MyImGuiDraw);
+}
+
+void MainThread(LPVOID lpParam) {
+    init(lpParam);
+}
+
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
     switch (ul_reason_for_call) {
     case DLL_PROCESS_ATTACH:
-        // 初始化 Hook 系统
-        g_MDX12::Initialize();
-        
-        // 设置自定义绘制回调
-        g_MDX12::SetSetupImGuiCallback(MyImGuiDraw);
+        if (HANDLE h = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)MainThread, hModule, 0, nullptr)) CloseHandle(h);
         break;
-        
+
     case DLL_PROCESS_DETACH:
         // 清理资源
         g_MDX12::FinalCleanupAll();
@@ -122,7 +127,7 @@ g_MDX12::g_D3D12Resources::g_FrameContexts     // 帧缓冲上下文
 
 #### 初始化和清理
 ```cpp
-void g_MDX12::Initialize()           // 启动 Hook 系统
+void g_MDX12::Initialize(LPVOID lpParam)           // 启动 Hook 系统
 void g_MDX12::FinalCleanupAll()      // 清理所有资源
 ```
 
