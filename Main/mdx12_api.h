@@ -19,7 +19,6 @@
 #include "../ImGui/imgui_internal.h"
 #include "../ImGui/imgui_impl_win32.h"
 #include "../ImGui/imgui_impl_dx12.h"
-#include "../MinHook/include/MinHook.h"
 #pragma warning(pop)
 
 // *** 静态链接已移至 mdx12_libs.cpp ***

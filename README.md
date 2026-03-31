@@ -25,7 +25,7 @@
 确保以下文件包含在你的项目中：
 - `mdx12_api.h` - 主 API 头文件
 - `mdx12_globals.cpp` - 全局变量定义
-- `hook.cpp` - D3D12 Hook 实现
+- `hooks.cpp` - D3D12 Hook 实现
 - `input.cpp` - 输入处理
 - `render.cpp` - 渲染资源管理
 - `setup_imgui.cpp` - ImGui 集成
@@ -37,15 +37,7 @@
 ```cpp
 #include "mdx12_api.h"
 
-extern "C" {
-#include "../MinHook/src/buffer.c"
-#include "../MinHook/src/hook.c"
-#include "../MinHook/src/trampoline.c"
-#include "../MinHook/src/hde/hde32.c"
-#include "../MinHook/src/hde/hde64.c"
-}
-
-// 定义自定义 ImGui 绘制函数
+/// 定义自定义 ImGui 绘制函数
 void MyImGuiDraw(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags)
 {
     // 检查菜单是否打开（按 F1 切换）
@@ -64,17 +56,22 @@ void MyImGuiDraw(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags)
     }
 }
 
+void init(LPVOID lpParam) {
+    g_MDX12::Initialize(lpParam);
+    g_MDX12::SetSetupImGuiCallback(MyImGuiDraw);
+}
+
+void MainThread(LPVOID lpParam) {
+    init(lpParam);
+}
+
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
     switch (ul_reason_for_call) {
     case DLL_PROCESS_ATTACH:
-        // 初始化 Hook 系统
-        g_MDX12::Initialize();
-        
-        // 设置自定义绘制回调
-        g_MDX12::SetSetupImGuiCallback(MyImGuiDraw);
+        if (HANDLE h = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)MainThread, hModule, 0, nullptr)) CloseHandle(h);
         break;
-        
+
     case DLL_PROCESS_DETACH:
         // 清理资源
         g_MDX12::FinalCleanupAll();
@@ -160,7 +157,7 @@ g_MDX12/
 |------|------|
 | `mdx12_api.h` | 主 API 头文件，包含所有公开接口 |
 | `mdx12_globals.cpp` | 全局变量定义和初始化 |
-| `hook.cpp` | D3D12 Present 和 ResizeBuffers 的 Hook 实现 |
+| `hooks.cpp` | D3D12 Present 和 ResizeBuffers 的 Hook 实现 |
 | `input.cpp` | 鼠标、键盘和原始输入的 Hook 和管理 |
 | `render.cpp` | 渲染资源生命周期管理 |
 | `setup_imgui.cpp` | ImGui 绘制逻辑和回调处理 |

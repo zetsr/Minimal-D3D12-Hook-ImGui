@@ -1,4 +1,5 @@
 #include "mdx12_api.h"
+#include "../MinHook/include/MinHook.h"
 
 #pragma warning(push)
 #pragma warning(disable: 26451)

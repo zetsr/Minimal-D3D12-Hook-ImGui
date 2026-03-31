@@ -16,6 +16,12 @@
     <Filter Include="Font">
       <UniqueIdentifier>{2ac084e4-933e-457e-8dc8-1b70aca23201}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MinHook\src">
+      <UniqueIdentifier>{9382e930-f188-440f-84d4-4ceaeec2fbf6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MinHook\src\hde">
+      <UniqueIdentifier>{24617045-5916-4258-844c-a8f9b56acfd1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
@@ -51,6 +57,27 @@
     <ClInclude Include="Main\mdx12_api.h">
       <Filter>Main</Filter>
     </ClInclude>
+    <ClInclude Include="MinHook\src\buffer.h">
+      <Filter>MinHook\src</Filter>
+    </ClInclude>
+    <ClInclude Include="MinHook\src\trampoline.h">
+      <Filter>MinHook\src</Filter>
+    </ClInclude>
+    <ClInclude Include="MinHook\src\hde\hde32.h">
+      <Filter>MinHook\src\hde</Filter>
+    </ClInclude>
+    <ClInclude Include="MinHook\src\hde\hde64.h">
+      <Filter>MinHook\src\hde</Filter>
+    </ClInclude>
+    <ClInclude Include="MinHook\src\hde\pstdint.h">
+      <Filter>MinHook\src\hde</Filter>
+    </ClInclude>
+    <ClInclude Include="MinHook\src\hde\table32.h">
+      <Filter>MinHook\src\hde</Filter>
+    </ClInclude>
+    <ClInclude Include="MinHook\src\hde\table64.h">
+      <Filter>MinHook\src\hde</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ImGui\imgui.cpp">
@@ -77,9 +104,6 @@
     <ClCompile Include="Main\dllmain.cpp">
       <Filter>Main</Filter>
     </ClCompile>
-    <ClCompile Include="Main\hook.cpp">
-      <Filter>Main</Filter>
-    </ClCompile>
     <ClCompile Include="Main\input.cpp">
       <Filter>Main</Filter>
     </ClCompile>
@@ -94,6 +118,24 @@
     </ClCompile>
     <ClCompile Include="Main\mdx12_globals.cpp">
       <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="Main\hooks.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="MinHook\src\buffer.c">
+      <Filter>MinHook\src</Filter>
+    </ClCompile>
+    <ClCompile Include="MinHook\src\hook.c">
+      <Filter>MinHook\src</Filter>
+    </ClCompile>
+    <ClCompile Include="MinHook\src\trampoline.c">
+      <Filter>MinHook\src</Filter>
+    </ClCompile>
+    <ClCompile Include="MinHook\src\hde\hde32.c">
+      <Filter>MinHook\src\hde</Filter>
+    </ClCompile>
+    <ClCompile Include="MinHook\src\hde\hde64.c">
+      <Filter>MinHook\src\hde</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
