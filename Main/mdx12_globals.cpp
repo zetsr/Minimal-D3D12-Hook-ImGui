@@ -85,6 +85,8 @@ namespace g_MDX12 {
         std::string g_processName;
         HWND g_mainWindow = nullptr;
         RECT g_windowRect = { 0 };
+        RECT g_cachedRect; 
+        bool g_isFocused;
     }
 
     // Input state

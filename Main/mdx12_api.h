@@ -118,6 +118,8 @@ namespace g_MDX12 {
         extern std::string g_processName;
         extern HWND g_mainWindow;
         extern RECT g_windowRect;
+        extern RECT g_cachedRect;
+        extern bool g_isFocused;
     }
 
     // Input state namespace

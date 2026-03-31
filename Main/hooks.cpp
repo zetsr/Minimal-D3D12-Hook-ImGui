@@ -42,9 +42,8 @@ namespace g_MDX12 {
             return S_OK;
         }
 
-        std::lock_guard<std::mutex> lock(g_InitState::g_InitMutex);
-
         if (!g_InitState::g_Initialized) {
+            std::lock_guard<std::mutex> lock(g_InitState::g_InitMutex);
             ID3D12Device* deviceFromSwap = nullptr;
 
             if (FAILED(pSwapChain->GetDevice(IID_PPV_ARGS(&deviceFromSwap)))) {
@@ -133,21 +132,14 @@ namespace g_MDX12 {
                 return S_OK;
             }
 
-            // ---------------------------------------------------------
-            // [FIX BEGIN] 修复 ImGui 风格在 Resize 时被重置的问题
-            // 逻辑：只有当 ImGui 上下文不存在时（第一次运行），才创建上下文和应用默认风格。
-            // ---------------------------------------------------------
             if (!ImGui::GetCurrentContext()) {
                 ImGui::CreateContext();
 
-                // 下面这行代码就是罪魁祸首，只有首次初始化才跑它
-                ImGui::StyleColorsDark();
+                // 只有首次初始化才跑它
+                ImGui::StyleColorsClassic();
 
                 ImGui_ImplWin32_Init(g_ProcessWindow::g_mainWindow);
             }
-            // ---------------------------------------------------------
-            // [FIX END]
-            // ---------------------------------------------------------
 
             ImGuiIO& io = ImGui::GetIO();
             io.IniFilename = nullptr;
@@ -230,32 +222,6 @@ namespace g_MDX12 {
             io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
         }
 
-        if (cursorStateChanged) {
-            if (g_MenuState::g_isOpen) {
-                while (ShowCursor(FALSE) >= 0);
-                SetCursor(nullptr);
-                GetCursorPos(&g_MenuState::g_lastMousePos);
-                RECT rect;
-                GetWindowRect(g_ProcessWindow::g_mainWindow, &rect);
-                int centerX = rect.left + (rect.right - rect.left) / 2;
-                int centerY = rect.top + (rect.bottom - rect.top) / 2;
-                SetCursorPos(centerX, centerY);
-            }
-        }
-
-        if (g_MenuState::g_isOpen) {
-            static int frameCounter = 0;
-            frameCounter++;
-
-            if (frameCounter % 30 == 0) {
-                RECT rect;
-                GetWindowRect(g_ProcessWindow::g_mainWindow, &rect);
-                int centerX = rect.left + (rect.right - rect.left) / 2;
-                int centerY = rect.top + (rect.bottom - rect.top) / 2;
-                SetCursorPos(centerX, centerY);
-            }
-        }
-
         SetupImGui(pSwapChain, SyncInterval, Flags);
         ImGui::Render();
         ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), g_D3D12Resources::g_pd3dCommandList);
@@ -288,7 +254,9 @@ namespace g_MDX12 {
         DXGI_FORMAT NewFormat,
         UINT SwapChainFlags)
     {
-        std::lock_guard<std::mutex> lock(g_InitState::g_InitMutex);
+        if (!g_InitState::g_Initialized) {
+            std::lock_guard<std::mutex> lock(g_InitState::g_InitMutex);
+        }
 
         if (g_InitState::g_Initialized) {
             CleanupRenderResources_NoInput();
@@ -304,13 +272,6 @@ namespace g_MDX12 {
 
     DWORD WINAPI MainThread(LPVOID lpParam) {
         if (MH_Initialize() != MH_OK) return 0;
-
-        // ---------------------------------------------------------------
-        // [关键修复] 等待目标进程自然加载 d3d12.dll 与 dxgi.dll
-        // 使用 GetModuleHandleA 而非 LoadLibraryA：
-        //   - GetModuleHandleA 只查询已加载的模块，不会强制加载
-        //   - LoadLibraryA 在进程尚未准备好时强制加载可能引发崩溃
-        // ---------------------------------------------------------------
         if (!g_RuntimeModules::WaitAndLoad()) {
             // WaitAndLoad 目前是死循环直到成功，不会返回 false，此处作为保险
             return 0;
