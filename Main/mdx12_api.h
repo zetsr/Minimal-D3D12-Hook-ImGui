@@ -36,10 +36,13 @@ typedef HRESULT(WINAPI* PFN_CreateDXGIFactory1)(REFIID, void**);
 namespace g_MDX12 {
     // Fonts
     // extern ImFont* g_Alibaba_PuHuiTi_Regular;
-    // extern ImFont* g_Alibaba_PuHuiTi_Bold;
+    extern ImFont* g_Alibaba_PuHuiTi_Bold;
     // extern ImFont* g_Alibaba_PuHuiTi_Heavy;
     // extern ImFont* g_Alibaba_PuHuiTi_Light;
     extern ImFont* g_Alibaba_PuHuiTi_Medium;
+    extern ImFont* g_icomoon;
+    extern ImFont* g_icomoon_small;
+    extern ImFont* g_icomoon_big;
 
     // Hook function pointer types
     typedef HRESULT(STDMETHODCALLTYPE* PFN_Present)(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags);

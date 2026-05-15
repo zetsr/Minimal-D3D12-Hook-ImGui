@@ -1,11 +1,12 @@
 #include "mdx12_api.h"
 #include "../MinHook/include/MinHook.h"
 
-// #include "../Font/Alibaba-PuHuiTi-Bold.h"
+#include "../Font/Alibaba-PuHuiTi-Bold.h"
 // #include "../Font/Alibaba-PuHuiTi-Heavy.h"
 // #include "../Font/Alibaba-PuHuiTi-Light.h"
 #include "../Font/Alibaba-PuHuiTi-Medium.h"
 // #include "../Font/Alibaba-PuHuiTi-Regular.h"
+#include "../Font/icomoon.h"
 
 #pragma warning(push)
 #pragma warning(disable: 26451)
@@ -136,7 +137,11 @@ namespace g_MDX12 {
                 ImGui::CreateContext();
 
                 // 只有首次初始化才跑它
-                ImGui::StyleColorsClassic();
+                // ImGui::StyleColorsClassic();
+                // ImGui::StyleColorsLight();
+                // ImGui::StyleColorsDark();
+                // ImGui::StyleColorsOcean();
+                ImGui::StyleColorsShadow();
 
                 ImGui_ImplWin32_Init(g_ProcessWindow::g_mainWindow);
             }
@@ -152,14 +157,21 @@ namespace g_MDX12 {
             // Alibaba-PuHuiTi-Regular
             // g_MDX12::g_Alibaba_PuHuiTi_Regular = io.Fonts->AddFontFromMemoryTTF(g_Fonts::Alibaba_PuHuiTi_Regular, sizeof(g_Fonts::Alibaba_PuHuiTi_Regular), 18.0f, NULL, range);
 
+            // Alibaba-PuHuiTi-Medium
+            g_MDX12::g_Alibaba_PuHuiTi_Medium = io.Fonts->AddFontFromMemoryTTF(g_Fonts::Alibaba_PuHuiTi_Medium, sizeof(g_Fonts::Alibaba_PuHuiTi_Medium), 15.0f, NULL, range);
+
             // Alibaba-PuHuiTi-Bold
-            // g_MDX12::g_Alibaba_PuHuiTi_Bold = io.Fonts->AddFontFromMemoryTTF(g_Fonts::Alibaba_PuHuiTi_Bold, sizeof(g_Fonts::Alibaba_PuHuiTi_Bold), 18.0f, NULL, range);
+            g_MDX12::g_Alibaba_PuHuiTi_Bold = io.Fonts->AddFontFromMemoryTTF(g_Fonts::Alibaba_PuHuiTi_Bold, sizeof(g_Fonts::Alibaba_PuHuiTi_Bold), 18.0f, NULL, range);
+            
             // Alibaba-PuHuiTi-Heavy
             // g_MDX12::g_Alibaba_PuHuiTi_Heavy = io.Fonts->AddFontFromMemoryTTF(g_Fonts::Alibaba_PuHuiTi_Heavy, sizeof(g_Fonts::Alibaba_PuHuiTi_Heavy), 18.0f, NULL, range);
+            
             // Alibaba-PuHuiTi-Light
             // g_MDX12::g_Alibaba_PuHuiTi_Light = io.Fonts->AddFontFromMemoryTTF(g_Fonts::Alibaba_PuHuiTi_Light, sizeof(g_Fonts::Alibaba_PuHuiTi_Light), 18.0f, NULL, range);
-            // Alibaba-PuHuiTi-Medium
-            g_MDX12::g_Alibaba_PuHuiTi_Medium = io.Fonts->AddFontFromMemoryTTF(g_Fonts::Alibaba_PuHuiTi_Medium, sizeof(g_Fonts::Alibaba_PuHuiTi_Medium), 18.0f, NULL, range);
+            
+            g_MDX12::g_icomoon = io.Fonts->AddFontFromMemoryTTF(g_Fonts::icomoon, sizeof(g_Fonts::icomoon), 30.0f, NULL, atlas->GetGlyphRangesDefault());
+            g_MDX12::g_icomoon_small = io.Fonts->AddFontFromMemoryTTF(g_Fonts::icomoon, sizeof(g_Fonts::icomoon), 18.0f, NULL, atlas->GetGlyphRangesDefault());
+            g_MDX12::g_icomoon_big = io.Fonts->AddFontFromMemoryTTF(g_Fonts::icomoon, sizeof(g_Fonts::icomoon), 40.0f, NULL, atlas->GetGlyphRangesDefault());
 
             // DX12 后端必须重新初始化，因为 resize 可能会让之前的 backend 对象失效
             ImGui_ImplDX12_Init(g_D3D12Resources::g_pd3dDevice, g_D3D12Resources::g_bufferCount, desc.BufferDesc.Format, g_D3D12Resources::g_pd3dSrvDescHeap, g_D3D12Resources::g_pd3dSrvDescHeap->GetCPUDescriptorHandleForHeapStart(), g_D3D12Resources::g_pd3dSrvDescHeap->GetGPUDescriptorHandleForHeapStart());

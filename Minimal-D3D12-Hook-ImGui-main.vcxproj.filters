@@ -78,6 +78,9 @@
     <ClInclude Include="MinHook\src\hde\table64.h">
       <Filter>MinHook\src\hde</Filter>
     </ClInclude>
+    <ClInclude Include="Font\icomoon.h">
+      <Filter>Font</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ImGui\imgui.cpp">
