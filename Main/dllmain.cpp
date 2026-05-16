@@ -35,6 +35,17 @@ void MyImGuiDraw(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags)
     ImGuiIO& io = ImGui::GetIO();
     float deltaTime = io.DeltaTime;
 
+    if (g_MDX12::g_MenuState::g_isOpen) {
+        g_MenuAlpha += io.DeltaTime * FADE_SPEED;
+        if (g_MenuAlpha > 1.0f) g_MenuAlpha = 1.0f;
+    }
+    else {
+        g_MenuAlpha -= io.DeltaTime * FADE_SPEED;
+        if (g_MenuAlpha < 0.0f) g_MenuAlpha = 0.0f;
+    }
+
+    if (g_MenuAlpha <= 0.001f) return;
+
     if (firstRun) {
         float baseHeight = io.DisplaySize.y * 0.33f;
         firstSize = ImVec2(580, 370/*baseHeight * (16.0f / 10.0f), baseHeight*/);
@@ -55,17 +66,6 @@ void MyImGuiDraw(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags)
     ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 6.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_Alpha, g_MenuAlpha);
-
-    if (g_MDX12::g_MenuState::g_isOpen) {
-        g_MenuAlpha += io.DeltaTime * FADE_SPEED;
-        if (g_MenuAlpha > 1.0f) g_MenuAlpha = 1.0f;
-    }
-    else {
-        g_MenuAlpha -= io.DeltaTime * FADE_SPEED;
-        if (g_MenuAlpha < 0.0f) g_MenuAlpha = 0.0f;
-    }
-
-    if (g_MenuAlpha <= 0.001f) return;
 
     if (ImGui::Begin("Pro Adaptive Menu", &g_MDX12::g_MenuState::g_isOpen, window_flags))
     {
@@ -233,7 +233,7 @@ void MyImGuiDraw(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags)
                     }
 
                     if (ImGui::BeginPopup("LineColPopup")) {
-                        ImGui::ColorPicker4("##LinePicker", box_color, MinimalColorFlags);
+                        ImGui::ColorPicker4("##LinePicker", line_color, MinimalColorFlags);
                         ImGui::EndPopup();
                     }
 
