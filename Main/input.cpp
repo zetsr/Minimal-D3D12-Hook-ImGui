@@ -305,17 +305,32 @@ namespace g_MDX12 {
                 g_f1Down = true;
                 g_MenuState::g_isOpen = !g_MenuState::g_isOpen;
 
-                if (g_MenuState::g_isOpen) {
-                    GetCursorPos(&g_MenuState::g_lastMousePos);
-                    RECT rect;
-                    GetWindowRect(g_ProcessWindow::g_mainWindow, &rect);
-                    int centerX = rect.left + (rect.right - rect.left) / 2;
-                    int centerY = rect.top + (rect.bottom - rect.top) / 2;
-                    SetCursorPos(centerX, centerY);
+                // 状态重置
+                if (ImGui::GetCurrentContext() != nullptr) {
+                    ImGuiIO& io = ImGui::GetIO();
+
+                    if (g_MenuState::g_isOpen) {
+                        // 开启菜单时：清除鼠标按键状态，防止带入之前的点击或拖拽指令
+                        io.ClearInputKeys();
+                        // 强制将当前帧的鼠标位置设置为系统真实位置，防止 ImGui 沿用上一帧的缓存坐标
+                        POINT p;
+                        if (g_HookFunctions::g_oGetCursorPos) g_HookFunctions::g_oGetCursorPos(&p);
+                        else GetCursorPos(&p);
+                        ScreenToClient(hwnd, &p);
+                        io.MousePos = ImVec2((float)p.x, (float)p.y);
+                    }
+                    else {
+                        // 关闭菜单时：将 ImGui 的鼠标坐标移出屏幕，防止关闭瞬间 ImGui 还在触发 Hover 状态导致系统光标视觉撕裂
+                        io.MousePos = ImVec2(-FLT_MAX, -FLT_MAX);
+                        for (int i = 0; i < ImGuiMouseButton_COUNT; i++) {
+                            io.MouseDown[i] = false;
+                        }
+                    }
                 }
-                else {
-                    SetCursorPos(g_MenuState::g_lastMousePos.x, g_MenuState::g_lastMousePos.y);
-                }
+
+                // 处理 ClipCursor 和 ShowCursor
+                UpdateInputBlockState();
+                cursorhook::UpdateCursorState();
 
                 return 0;
             }
