@@ -10,6 +10,7 @@
 #define ICON_LOCK      "G"
 #define ICON_UNLOCK    "H"
 #define ICON_REFRESH   "I"
+#define ICON_SCRIPT    "J"
 
 float g_MenuAlpha = 0.0f;
 
@@ -36,7 +37,7 @@ void MyImGuiDraw(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags)
 
     if (firstRun) {
         float baseHeight = io.DisplaySize.y * 0.33f;
-        firstSize = ImVec2(baseHeight * (16.0f / 10.0f), baseHeight);
+        firstSize = ImVec2(580, 370/*baseHeight * (16.0f / 10.0f), baseHeight*/);
         ImGui::SetNextWindowSize(firstSize, ImGuiCond_FirstUseEver);
         firstRun = false;
     }
@@ -76,7 +77,7 @@ void MyImGuiDraw(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags)
         // [侧边栏参数计算]
         ImGui::PushFont(g_MDX12::g_icomoon);
         const float sideBarW = ImGui::CalcTextSize(ICON_AIMBOT).x + (style.FramePadding.x * 8.0f);
-        const float tabH = 60.0f;
+        const float tabH = ImGui::CalcTextSize(ICON_AIMBOT).y * 2;
         ImGui::PopFont();
 
         // [渲染左侧边栏背景]
@@ -86,13 +87,13 @@ void MyImGuiDraw(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags)
         // [渲染左侧边栏按钮]
         ImGui::BeginGroup();
         {
-            const char* tabIcons[] = { ICON_AIMBOT, ICON_VISUALS, ICON_TEAM, ICON_MISC, ICON_CONFIG };
+            const char* tabIcons[] = { ICON_AIMBOT, ICON_VISUALS, ICON_TEAM, ICON_MISC, ICON_CONFIG, ICON_SCRIPT };
 
             for (int i = 0; i < std::ssize(tabIcons); i++) {
                 ImVec2 cursorPos = ImGui::GetCursorScreenPos();
                 bool isSelected = (selectedMainTab == i);
 
-                // 1. 正常的隐形按钮：保持原本满宽（sideBarW）和满高（tabH），绝不破坏垂直排版
+                // 1. 隐形按钮
                 ImGui::PushID(i);
                 if (ImGui::InvisibleButton("##TabBtn", ImVec2(sideBarW, tabH))) {
                     selectedMainTab = i;
@@ -113,23 +114,11 @@ void MyImGuiDraw(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags)
                 float btnStartX = cursorPos.x + sideBarW - highlightW;
                 ImU32 textColor = ImGui::GetColorU32(isSelected ? ImGuiCol_Text : (isHovered ? ImGuiCol_Text : ImGuiCol_TextDisabled));
 
-                // 3. 绘制高亮背景（垂直坐标依旧采用原汁原味的 cursorPos.y，确保垂直完全不变）
-                if (isSelected) {
-                    // 选中状态：右对齐的矩形背景
-                    // drawList->AddRectFilled(ImVec2(btnStartX, cursorPos.y), ImVec2(btnStartX + highlightW, cursorPos.y + tabH), ImGui::GetColorU32(ImGuiCol_HeaderActive));
-                    // 激活指示线：紧贴在右对齐矩形的最左侧
-                    // drawList->AddRectFilled(ImVec2(btnStartX, cursorPos.y), ImVec2(btnStartX + 3.0f, cursorPos.y + tabH), ImGui::GetColorU32(ImGuiCol_CheckMark));
-                }
-                else if (isHovered) {
-                    // 悬浮状态：右对齐的矩形背景
-                    // drawList->AddRectFilled(ImVec2(btnStartX, cursorPos.y), ImVec2(btnStartX + highlightW, cursorPos.y + tabH), ImGui::GetColorU32(ImGuiCol_HeaderHovered));
-                }
-
-                // 4. 绘制图标（垂直对齐算法恢复成你最初完全正确的逻辑）
+                // 3. 绘制图标
                 ImGui::PushFont(g_MDX12::g_icomoon);
                 ImVec2 iconPos = ImVec2(
-                    btnStartX + paddingX,                  // 水平靠右并留出 Padding
-                    cursorPos.y + (tabH - iconSize.y) * 0.5f // 垂直居中（与你最初的代码完全一致）
+                    btnStartX + paddingX,                    // 水平靠右并留出 Padding
+                    cursorPos.y + (tabH - iconSize.y) * 0.5f // 垂直居中
                 );
                 drawList->AddText(iconPos, textColor, tabIcons[i]);
                 ImGui::PopFont();
@@ -147,7 +136,7 @@ void MyImGuiDraw(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags)
 
             ImGui::PushFont(g_MDX12::g_icomoon_small);
             float smIconH = ImGui::GetTextLineHeight();
-            float iconsWidth = (ImGui::CalcTextSize(ICON_GITHUB).x * 2) + 25.0f;
+            float iconsWidth = (ImGui::CalcTextSize(ICON_GITHUB).x * 3);
             ImGui::PopFont();
             float textH = ImGui::GetTextLineHeight();
 
@@ -159,7 +148,7 @@ void MyImGuiDraw(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags)
                 float titleYOffset = (smIconH - textH) * 0.5f;
                 ImGui::SetCursorPosY(ImGui::GetCursorPosY() + titleYOffset);
 
-                const char* tabNames[] = { "AIMBOT MODULE", "VISUALS MODULE", "PLAYERS", "SETTINGS", "CONFIGS" };
+                const char* tabNames[] = { "AIMBOT", "VISUALS", "PLAYERS", "SETTINGS", "CONFIGS", "SCRIPTS"};
                 ImGui::PushFont(g_MDX12::g_Alibaba_PuHuiTi_Bold);
                 ImGui::TextColored(style.Colors[ImGuiCol_PlotLines], tabNames[selectedMainTab]);
                 ImGui::PopFont();
@@ -169,7 +158,7 @@ void MyImGuiDraw(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags)
 
                 ImGui::PushFont(g_MDX12::g_icomoon_small);
                 if (ImGui::Selectable(g_Locked ? ICON_LOCK : ICON_UNLOCK, false, 0, ImVec2(smIconH, smIconH))) g_Locked = !g_Locked;
-                ImGui::SameLine(0, 15.0f);
+                ImGui::SameLine(0, ImGui::CalcTextSize(ICON_GITHUB).x * 0.5f);
                 if (ImGui::Selectable(ICON_GITHUB, false, 0, ImVec2(smIconH, smIconH))) ShellExecuteA(NULL, "open", "https://github.com", NULL, NULL, SW_SHOWNORMAL);
                 ImGui::PopFont();
             }
@@ -199,10 +188,6 @@ void MyImGuiDraw(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags)
                 {
                     ImGui::Indent(10); ImGui::Spacing();
                     ImGui::TextDisabled("Automation"); ImGui::Separator();
-                    static bool aim_enable = false, aim_silent = false, aim_team = false;
-                    ImGui::Checkbox("Enable Aimbot", &aim_enable);
-                    ImGui::Checkbox("Silent Aim", &aim_silent);
-                    ImGui::Checkbox("Target Teammates", &aim_team);
                 }
                 ImGui::EndChild();
 
@@ -212,30 +197,15 @@ void MyImGuiDraw(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags)
                 {
                     ImGui::Indent(10); ImGui::Spacing();
                     ImGui::TextDisabled("Accuracy"); ImGui::Separator();
-                    static float aim_fov = 124.2f, aim_smooth = 14.5f;
-                    static int aim_bone = 3; // Pelvis
-
-                    ImGui::Text("Field of View");
-                    ImGui::SetNextItemWidth(-10);
-                    ImGui::SliderFloat("##FOV", &aim_fov, 1.0f, 180.0f, "%.0f");
-
-                    ImGui::Text("Smoothing");
-                    ImGui::SetNextItemWidth(-10);
-                    ImGui::SliderFloat("##Smooth", &aim_smooth, 1.0f, 30.0f, "%.1f");
-
-                    ImGui::Text("Target Bone");
-                    const char* bones[] = { "Head", "Neck", "Chest", "Pelvis" };
-                    ImGui::SetNextItemWidth(-10);
-                    ImGui::Combo("##Bone", &aim_bone, bones, IM_ARRAYSIZE(bones));
                 }
                 ImGui::EndChild();
             }
             else if (selectedMainTab == 1) // VISUALS
             {
-                ImGui::BeginChild("##EspGen", ImVec2(itemW, dynamicChildHeight), true);
+                ImGui::BeginChild("##ESPDino", ImVec2(itemW, dynamicChildHeight), true);
                 {
                     ImGui::Indent(10); ImGui::Spacing();
-                    ImGui::TextDisabled("Overlay"); ImGui::Separator();
+                    ImGui::TextDisabled("Dino"); ImGui::Separator();
                     static bool esp_box = false, esp_name = false, esp_health = false, esp_line = false;
                     static float line_color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
                     static float box_color[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
@@ -272,10 +242,10 @@ void MyImGuiDraw(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags)
 
                 ImGui::SameLine(0, gridSpacing);
 
-                ImGui::BeginChild("##ChamsGen", ImVec2(itemW, dynamicChildHeight), true);
+                ImGui::BeginChild("##ESPStructure", ImVec2(itemW, dynamicChildHeight), true);
                 {
                     ImGui::Indent(10); ImGui::Spacing();
-                    ImGui::TextDisabled("Models"); ImGui::Separator();
+                    ImGui::TextDisabled("Structure"); ImGui::Separator();
                     static bool chams_en = false, chams_xray = false;
                     static float chams_col_vis[4] = { 0.0f, 1.0f, 0.0f, 1.0f };
                     static float chams_col_hid[4] = { 1.0f, 1.0f, 0.0f, 1.0f };
@@ -310,86 +280,73 @@ void MyImGuiDraw(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags)
             }
             else if (selectedMainTab == 2) // PLAYERS
             {
-                ImGui::BeginChild("##PlayerList", ImVec2(availWidth, dynamicChildHeight), true);
+                ImGui::BeginChild("##PlayerEnemy", ImVec2(itemW, dynamicChildHeight), true);
                 {
                     ImGui::Indent(10); ImGui::Spacing();
-                    ImGui::TextDisabled("Active Players in Session"); ImGui::Separator();
-
-                    static int selectedPlayer = -1;
-                    const char* players[] = { "Player_001 (Level 50)", "Admin_Alpha (Level 999)", "User_123 (Level 12)", "Unknown_Entity" };
-
-                    if (ImGui::BeginListBox("##plist", ImVec2(-10, -80))) {
-                        for (int n = 0; n < IM_ARRAYSIZE(players); n++) {
-                            const bool is_selected = (selectedPlayer == n);
-                            if (ImGui::Selectable(players[n], is_selected)) selectedPlayer = n;
-                        }
-                        ImGui::EndListBox();
-                    }
-
-                    if (selectedPlayer != -1) {
-                        if (ImGui::Button("Teleport", ImVec2(120, 30))) { /* Teleport Logic */ }
-                        ImGui::SameLine();
-                        if (ImGui::Button("Spectate", ImVec2(120, 30))) { /* Spectate Logic */ }
-                        ImGui::SameLine();
-                        if (ImGui::Button("Force Crash", ImVec2(120, 30))) { /* Exploit Logic */ }
-                    }
-                }
-                ImGui::EndChild();
-            }
-            else if (selectedMainTab == 3) // SETTINGS
-            {
-                ImGui::BeginChild("##MenuSet", ImVec2(itemW, dynamicChildHeight), true);
-                {
-                    ImGui::Indent(10); ImGui::Spacing();
-                    ImGui::TextDisabled("Interface Settings"); ImGui::Separator();
-
-                    ImGui::Text("Menu Transparency");
-                    ImGui::SetNextItemWidth(-10);
-
-                    static bool show_fps = true;
-                    ImGui::Checkbox("Show Overlay FPS", &show_fps);
+                    ImGui::TextDisabled("Enemy"); ImGui::Separator();
                 }
                 ImGui::EndChild();
 
                 ImGui::SameLine(0, gridSpacing);
 
+                ImGui::BeginChild("##PlayerTeam", ImVec2(itemW, dynamicChildHeight), true);
+                {
+                    ImGui::Indent(10); ImGui::Spacing();
+                    ImGui::TextDisabled("Team"); ImGui::Separator();
+                }
+                ImGui::EndChild();
+            }
+            else if (selectedMainTab == 3) // SETTINGS
+            {
                 ImGui::BeginChild("##MiscSet", ImVec2(itemW, dynamicChildHeight), true);
                 {
                     ImGui::Indent(10); ImGui::Spacing();
-                    ImGui::TextDisabled("Exploits"); ImGui::Separator();
-                    static bool bhop = false, noclip = false;
-                    static float speed_mult = 1.0f;
+                    ImGui::TextDisabled("Miscellaneous"); ImGui::Separator();
+                }
+                ImGui::EndChild();
 
-                    ImGui::Checkbox("Auto BunnyHop", &bhop);
-                    ImGui::Checkbox("No Clip (N)", &noclip);
+                ImGui::SameLine(0, gridSpacing);
 
-                    ImGui::Text("Speed Multiplier");
-                    ImGui::SetNextItemWidth(-10);
-                    ImGui::SliderFloat("##Speed", &speed_mult, 1.0f, 10.0f, "x%.1f");
+                ImGui::BeginChild("##MenuSet", ImVec2(itemW, dynamicChildHeight), true);
+                {
+                    ImGui::Indent(10); ImGui::Spacing();
+                    ImGui::TextDisabled("Settings"); ImGui::Separator();
                 }
                 ImGui::EndChild();
             }
             else if (selectedMainTab == 4) // CONFIGS
             {
-                ImGui::BeginChild("##ConfigList", ImVec2(availWidth, dynamicChildHeight), true);
+                ImGui::BeginChild("##ConfigList", ImVec2(itemW, dynamicChildHeight), true);
                 {
                     ImGui::Indent(10); ImGui::Spacing();
-                    ImGui::TextDisabled("Configuration Profiles"); ImGui::Separator();
+                    ImGui::TextDisabled("Profiles"); ImGui::Separator();
+                }
+                ImGui::EndChild();
 
-                    static char cfgName[64] = "Legit_v1.2";
-                    ImGui::Text("Profile Name");
-                    ImGui::SetNextItemWidth(300);
-                    ImGui::InputText("##Name", cfgName, 64);
+                ImGui::SameLine(0, gridSpacing);
 
-                    ImGui::Spacing();
-                    if (ImGui::Button("Save Profile", ImVec2(140, 35))) { /* Save logic */ }
-                    ImGui::SameLine();
-                    if (ImGui::Button("Load Selected", ImVec2(140, 35))) { /* Load logic */ }
-                    ImGui::SameLine();
-                    if (ImGui::Button("Delete", ImVec2(140, 35))) { /* Delete logic */ }
+                ImGui::BeginChild("##ScriptList", ImVec2(itemW, dynamicChildHeight), true);
+                {
+                    ImGui::Indent(10); ImGui::Spacing();
+                    ImGui::TextDisabled("Scripts"); ImGui::Separator();
+                }
+                ImGui::EndChild();
+            }
+            else if (selectedMainTab == 5) // SCRIPT
+            {
+                ImGui::BeginChild("##Script A", ImVec2(itemW, dynamicChildHeight), true);
+                {
+                    ImGui::Indent(10); ImGui::Spacing();
+                    ImGui::TextDisabled("A"); ImGui::Separator();
+                }
+                ImGui::EndChild();
 
-                    ImGui::Spacing(); ImGui::Separator();
-                    ImGui::TextColored(ImVec4(0.5f, 1.0f, 0.5f, 1.0f), "Status: Configuration Loaded Successfully.");
+                ImGui::SameLine(0, gridSpacing);
+
+                ImGui::BeginChild("##Script B", ImVec2(itemW, dynamicChildHeight), true);
+                {
+                    ImGui::Indent(10); ImGui::Spacing();
+                    ImGui::TextDisabled("B"); ImGui::Separator();
                 }
                 ImGui::EndChild();
             }
