@@ -14,6 +14,32 @@
 
 float g_MenuAlpha = 0.0f;
 
+// 将虚拟键码转换为字符串的辅助函数
+const char* GetKeyName(UINT vk) {
+    if (vk >= 'A' && vk <= 'Z') {
+        static char buf[2] = { 0 };
+        buf[0] = (char)vk;
+        return buf;
+    }
+    if (vk >= '0' && vk <= '9') {
+        static char buf[2] = { 0 };
+        buf[0] = (char)vk;
+        return buf;
+    }
+    switch (vk) {
+    case VK_F1: return "F1"; case VK_F2: return "F2"; case VK_F3: return "F3"; case VK_F4: return "F4";
+    case VK_F5: return "F5"; case VK_F6: return "F6"; case VK_F7: return "F7"; case VK_F8: return "F8";
+    case VK_F9: return "F9"; case VK_F10: return "F10"; case VK_F11: return "F11"; case VK_F12: return "F12";
+    case VK_INSERT: return "INSERT"; case VK_DELETE: return "DELETE"; case VK_HOME: return "HOME";
+    case VK_END: return "END"; case VK_PRIOR: return "PAGE UP"; case VK_NEXT: return "PAGE DOWN";
+    case VK_TAB: return "TAB"; case VK_LSHIFT: return "LSHIFT"; case VK_RSHIFT: return "RSHIFT";
+    case VK_LCONTROL: return "LCTRL"; case VK_RCONTROL: return "RCTRL"; case VK_LMENU: return "LALT";
+    case VK_RMENU: return "RALT"; case VK_CAPITAL: return "CAPSLOCK"; case VK_SPACE: return "SPACE";
+    case VK_RETURN: return "ENTER"; case VK_ESCAPE: return "ESCAPE";
+    default: return "UNKNOWN";
+    }
+}
+
 void MyImGuiDraw(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags)
 {
 
@@ -311,6 +337,25 @@ void MyImGuiDraw(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags)
                 {
                     ImGui::Indent(10); ImGui::Spacing();
                     ImGui::TextDisabled("Settings"); ImGui::Separator();
+
+                    // ==================== 按键 1：菜单开关 ====================
+                    ImGui::Text("Menu Toggle Key:");
+                    ImGui::SameLine();
+
+                    char btnLabel1[64];
+                    // 判断当前录制的目标是不是 g_openKey 的地址
+                    if (g_MDX12::g_MenuState::g_pCurrentBindingKey == &g_MDX12::g_MenuState::g_openKey) {
+                        strcpy_s(btnLabel1, "Press any key...");
+                    }
+                    else {
+                        sprintf_s(btnLabel1, "%s", GetKeyName(g_MDX12::g_MenuState::g_openKey));
+                    }
+
+                    if (ImGui::Button(btnLabel1)) {
+                        // 传入 g_openKey 的地址
+                        g_MDX12::g_MenuState::g_pCurrentBindingKey = &g_MDX12::g_MenuState::g_openKey;
+                    }
+
                 }
                 ImGui::EndChild();
             }

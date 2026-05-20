@@ -301,7 +301,42 @@ namespace g_MDX12 {
         }
 
         LRESULT APIENTRY WndProcHook(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-            if (uMsg == WM_KEYDOWN && wParam == VK_F1 && !g_f1Down) {
+            // 【通用升级】如果当前正在录制任意按键（指针不为空）
+            if (g_MenuState::g_pCurrentBindingKey != nullptr) {
+                if (uMsg == WM_KEYDOWN || uMsg == WM_SYSKEYDOWN) {
+                    UINT vk = (UINT)wParam;
+
+                    // 排除鼠标误触
+                    if (vk != VK_LBUTTON && vk != VK_RBUTTON && vk != VK_MBUTTON) {
+                        if (vk == VK_ESCAPE) {
+                            // 按 ESC 取消录制
+                            g_MenuState::g_pCurrentBindingKey = nullptr;
+                        }
+                        else {
+                            // 核心：直接向指针指向的内存写入捕获的原生虚拟键码！
+                            *g_MenuState::g_pCurrentBindingKey = vk;
+
+                            g_MenuState::g_pCurrentBindingKey = nullptr; // 录制结束，清空指针
+                            g_MenuState::g_bindingFinished = true;        // 激活弹起保护
+                        }
+                        return 0; // 拦截，不响应游戏和 ImGui
+                    }
+                }
+                // 录制期间拦截所有键盘杂音
+                if (uMsg == WM_KEYUP || uMsg == WM_SYSKEYUP || uMsg == WM_CHAR) {
+                    return 0;
+                }
+            }
+
+            // 清除录制那一瞬间的按键弹起消息（保持不变）
+            if (g_MenuState::g_bindingFinished) {
+                if (uMsg == WM_KEYUP || uMsg == WM_SYSKEYUP) {
+                    g_MenuState::g_bindingFinished = false;
+                    return 0;
+                }
+            }
+
+            if (uMsg == WM_KEYDOWN && wParam == g_MenuState::g_openKey && !g_f1Down) {
                 g_f1Down = true;
                 g_MenuState::g_isOpen = !g_MenuState::g_isOpen;
 
@@ -334,18 +369,12 @@ namespace g_MDX12 {
 
                 return 0;
             }
-            else if (uMsg == WM_KEYUP && wParam == VK_F1) {
+            else if (uMsg == WM_KEYUP && wParam == g_MenuState::g_openKey) {
                 g_f1Down = false;
                 return 0;
             }
 
-            if (uMsg == WM_INPUT) {
-                if (g_MenuState::g_isOpen && g_InputState::g_blockMouseInput) {
-                    return 0;
-                }
-            }
-
-            if (uMsg == WM_INPUT_DEVICE_CHANGE) {
+            if (uMsg == WM_INPUT || uMsg == WM_INPUT_DEVICE_CHANGE) {
                 if (g_MenuState::g_isOpen && g_InputState::g_blockMouseInput) {
                     return 0;
                 }

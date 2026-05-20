@@ -101,6 +101,9 @@ namespace g_MDX12 {
     // Menu state
     namespace g_MenuState {
         bool g_isOpen = true;
+        UINT g_openKey = VK_F1;
+        UINT* g_pCurrentBindingKey = nullptr;
+        bool g_bindingFinished = false;
         bool g_wasOpenLastFrame = true;
         POINT g_lastMousePos = { 0, 0 };
     }
