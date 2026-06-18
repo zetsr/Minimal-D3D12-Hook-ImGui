@@ -1,4 +1,5 @@
 ﻿#include "mdx12_api.h"
+#define U8(str) reinterpret_cast<const char*>(u8##str)
 
 // --- 1. 图标宏定义 (g_icomoon 映射) ---
 #define ICON_AIMBOT    "A"
@@ -106,13 +107,13 @@ void MyImGuiDraw(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags)
         ImGui::PopFont();
 
         // [渲染左侧边栏背景]
-        ImVec2 p = ImGui::GetCursorScreenPos();
-        drawList->AddRectFilled(p, ImVec2(p.x + sideBarW, p.y + winSize.y), ImGui::GetColorU32(ImGuiCol_ChildBg));
+        // ImVec2 p = ImGui::GetCursorScreenPos();
+        // drawList->AddRectFilled(p, ImVec2(p.x + sideBarW, p.y + winSize.y), ImGui::GetColorU32(ImGuiCol_WindowBg));
 
         // [渲染左侧边栏按钮]
         ImGui::BeginGroup();
         {
-            const char* tabIcons[] = { ICON_AIMBOT, ICON_VISUALS, ICON_TEAM, ICON_MISC, ICON_CONFIG, ICON_SCRIPT };
+            const char* tabIcons[] = { ICON_VISUALS, ICON_MISC };
 
             for (int i = 0; i < std::ssize(tabIcons); i++) {
                 ImVec2 cursorPos = ImGui::GetCursorScreenPos();
@@ -173,7 +174,7 @@ void MyImGuiDraw(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags)
                 float titleYOffset = (smIconH - textH) * 0.5f;
                 ImGui::SetCursorPosY(ImGui::GetCursorPosY() + titleYOffset);
 
-                const char* tabNames[] = { "AIMBOT", "VISUALS", "PLAYERS", "SETTINGS", "CONFIGS", "SCRIPTS"};
+                const char* tabNames[] = { U8("视觉"), U8("设置")};
                 ImGui::PushFont(g_MDX12::g_Alibaba_PuHuiTi_Bold);
                 ImGui::TextColored(style.Colors[ImGuiCol_PlotLines], tabNames[selectedMainTab]);
                 ImGui::PopFont();
@@ -201,31 +202,14 @@ void MyImGuiDraw(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags)
             ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(8.0f, 12.0f));
             ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 1.0f);
 
+            /*
             ImVec4 childBg = style.Colors[ImGuiCol_FrameBg];
             childBg.w = style.Colors[ImGuiCol_WindowBg].w;
             ImGui::PushStyleColor(ImGuiCol_ChildBg, childBg);
-
             ImGui::PushStyleColor(ImGuiCol_Border, style.Colors[ImGuiCol_Border]);
+             */
 
-            if (selectedMainTab == 0) // AIMBOT
-            {
-                ImGui::BeginChild("##AimbotGen", ImVec2(itemW, dynamicChildHeight), true);
-                {
-                    ImGui::Indent(10); ImGui::Spacing();
-                    ImGui::TextDisabled("Automation"); ImGui::Separator();
-                }
-                ImGui::EndChild();
-
-                ImGui::SameLine(0, gridSpacing);
-
-                ImGui::BeginChild("##AimbotAcc", ImVec2(itemW, dynamicChildHeight), true);
-                {
-                    ImGui::Indent(10); ImGui::Spacing();
-                    ImGui::TextDisabled("Accuracy"); ImGui::Separator();
-                }
-                ImGui::EndChild();
-            }
-            else if (selectedMainTab == 1) // VISUALS
+            if (selectedMainTab == 0) // VISUALS
             {
                 ImGui::BeginChild("##ESPDino", ImVec2(itemW, dynamicChildHeight), true);
                 {
@@ -303,48 +287,31 @@ void MyImGuiDraw(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags)
                 }
                 ImGui::EndChild();
             }
-            else if (selectedMainTab == 2) // PLAYERS
+
+            else if (selectedMainTab == 1) // SETTINGS
             {
-                ImGui::BeginChild("##PlayerEnemy", ImVec2(itemW, dynamicChildHeight), true);
+                ImGui::BeginChild("##Misc", ImVec2(itemW, dynamicChildHeight), true);
                 {
                     ImGui::Indent(10); ImGui::Spacing();
-                    ImGui::TextDisabled("Enemy"); ImGui::Separator();
+                    ImGui::TextDisabled(U8("杂项")); ImGui::Separator();
                 }
                 ImGui::EndChild();
 
                 ImGui::SameLine(0, gridSpacing);
 
-                ImGui::BeginChild("##PlayerTeam", ImVec2(itemW, dynamicChildHeight), true);
+                ImGui::BeginChild("##Menu", ImVec2(itemW, dynamicChildHeight), true);
                 {
                     ImGui::Indent(10); ImGui::Spacing();
-                    ImGui::TextDisabled("Team"); ImGui::Separator();
-                }
-                ImGui::EndChild();
-            }
-            else if (selectedMainTab == 3) // SETTINGS
-            {
-                ImGui::BeginChild("##MiscSet", ImVec2(itemW, dynamicChildHeight), true);
-                {
-                    ImGui::Indent(10); ImGui::Spacing();
-                    ImGui::TextDisabled("Miscellaneous"); ImGui::Separator();
-                }
-                ImGui::EndChild();
-
-                ImGui::SameLine(0, gridSpacing);
-
-                ImGui::BeginChild("##MenuSet", ImVec2(itemW, dynamicChildHeight), true);
-                {
-                    ImGui::Indent(10); ImGui::Spacing();
-                    ImGui::TextDisabled("Settings"); ImGui::Separator();
+                    ImGui::TextDisabled(U8("设置")); ImGui::Separator();
 
                     // ==================== 按键 1：菜单开关 ====================
-                    ImGui::Text("Menu Toggle Key:");
+                    ImGui::Text(U8("开关菜单"));
                     ImGui::SameLine();
 
                     char btnLabel1[64];
                     // 判断当前录制的目标是不是 g_openKey 的地址
                     if (g_MDX12::g_MenuState::g_pCurrentBindingKey == &g_MDX12::g_MenuState::g_openKey) {
-                        strcpy_s(btnLabel1, "Press any key...");
+                        strcpy_s(btnLabel1, U8("按下你想设置的键"));
                     }
                     else {
                         sprintf_s(btnLabel1, "%s", GetKeyName(g_MDX12::g_MenuState::g_openKey));
@@ -358,44 +325,8 @@ void MyImGuiDraw(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags)
                 }
                 ImGui::EndChild();
             }
-            else if (selectedMainTab == 4) // CONFIGS
-            {
-                ImGui::BeginChild("##ConfigList", ImVec2(itemW, dynamicChildHeight), true);
-                {
-                    ImGui::Indent(10); ImGui::Spacing();
-                    ImGui::TextDisabled("Profiles"); ImGui::Separator();
-                }
-                ImGui::EndChild();
 
-                ImGui::SameLine(0, gridSpacing);
-
-                ImGui::BeginChild("##ScriptList", ImVec2(itemW, dynamicChildHeight), true);
-                {
-                    ImGui::Indent(10); ImGui::Spacing();
-                    ImGui::TextDisabled("Scripts"); ImGui::Separator();
-                }
-                ImGui::EndChild();
-            }
-            else if (selectedMainTab == 5) // SCRIPT
-            {
-                ImGui::BeginChild("##Script A", ImVec2(itemW, dynamicChildHeight), true);
-                {
-                    ImGui::Indent(10); ImGui::Spacing();
-                    ImGui::TextDisabled("A"); ImGui::Separator();
-                }
-                ImGui::EndChild();
-
-                ImGui::SameLine(0, gridSpacing);
-
-                ImGui::BeginChild("##Script B", ImVec2(itemW, dynamicChildHeight), true);
-                {
-                    ImGui::Indent(10); ImGui::Spacing();
-                    ImGui::TextDisabled("B"); ImGui::Separator();
-                }
-                ImGui::EndChild();
-            }
-
-            ImGui::PopStyleColor(2);
+            // ImGui::PopStyleColor(2);
             ImGui::PopStyleVar(2);
             ImGui::Unindent(contentPadding);
         }

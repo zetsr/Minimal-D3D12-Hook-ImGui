@@ -284,13 +284,12 @@ void ImGui::StyleColorsOcean(ImGuiStyle* dst)
 
     // --- 【极限微弱对比度调整】 ---
     // 主窗口基准暗色：RGB(0.04, 0.06, 0.09)
-    colors[ImGuiCol_WindowBg] = ImVec4(0.04f, 0.06f, 0.09f, 1.00f);
+    colors[ImGuiCol_WindowBg] = ImVec4(0.04f, 0.06f, 0.09f, 0.9f);
 
     // 子窗口：极限贴近主窗口，仅象征性提高 0.005f ~ 0.01f。
     // 这将实现真正的“若隐若现”，彻底消除由于颜色过亮导致的刺眼对比度。
-    colors[ImGuiCol_ChildBg] = ImVec4(0.045f, 0.068f, 0.10f, 1.00f);
-
-    colors[ImGuiCol_PopupBg] = ImVec4(0.05f, 0.07f, 0.10f, 0.98f);
+    colors[ImGuiCol_ChildBg] = ImVec4(0.04f, 0.06f, 0.09f, 0.6f);
+    colors[ImGuiCol_PopupBg] = ImVec4(0.05f, 0.07f, 0.10f, 1.0f);
 
     // 边框也同步调暗，防止边框线条因为对比度显得突兀
     colors[ImGuiCol_Border] = ImVec4(0.10f, 0.14f, 0.20f, 0.30f);
