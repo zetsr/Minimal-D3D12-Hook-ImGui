@@ -140,8 +140,8 @@ namespace g_MDX12 {
                 // ImGui::StyleColorsClassic();
                 // ImGui::StyleColorsLight();
                 // ImGui::StyleColorsDark();
-                // ImGui::StyleColorsOcean();
-                ImGui::StyleColorsShadow();
+                ImGui::StyleColorsOcean();
+                // ImGui::StyleColorsShadow();
 
                 ImGui_ImplWin32_Init(g_ProcessWindow::g_mainWindow);
             }

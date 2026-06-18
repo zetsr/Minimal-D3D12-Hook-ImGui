@@ -98,7 +98,6 @@ void MyImGuiDraw(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags)
         ImVec2 winSize = ImGui::GetWindowSize();
         ImGuiStyle& style = ImGui::GetStyle();
         ImDrawList* drawList = ImGui::GetWindowDrawList();
-        style.Colors[ImGuiCol_WindowBg].w = g_MenuAlpha > 0.9 ? 0.9 : g_MenuAlpha;
 
         // [侧边栏参数计算]
         ImGui::PushFont(g_MDX12::g_icomoon);
