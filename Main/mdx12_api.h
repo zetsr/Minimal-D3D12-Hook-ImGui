@@ -12,12 +12,11 @@
 
 #include "../MinHook/include/MinHook.h"
 
-#include "../Font/Alibaba-PuHuiTi-Bold.h"
+// #include "../Font/Alibaba-PuHuiTi-Bold.h"
 // #include "../Font/Alibaba-PuHuiTi-Heavy.h"
 // #include "../Font/Alibaba-PuHuiTi-Light.h"
 #include "../Font/Alibaba-PuHuiTi-Medium.h"
 // #include "../Font/Alibaba-PuHuiTi-Regular.h"
-#include "../Font/icomoon.h"
 
 #include "../ImGui/imgui.h"
 #include "../ImGui/imgui_internal.h"
@@ -109,7 +108,7 @@ namespace g_MDX12 {
                     }
                 }
 
-                Sleep(10);
+                Sleep(1);
             }
         }
     }
@@ -140,7 +139,7 @@ namespace g_MDX12 {
         inline bool g_Initialized = false;
         inline bool g_AfterFirstPresent = false;
         inline std::mutex g_InitMutex;
-        inline UINT g_waitTimeoutMs = 2000;
+        inline UINT g_waitTimeoutMs = 30000;
     }
 
     // Process and window namespace
@@ -194,18 +193,14 @@ namespace g_MDX12 {
         inline void ReinstallWindowHook();
     }
 
-    inline void CleanupRenderResources();
     inline void CleanupRenderResources_NoInput();
     inline void FinalCleanupAll();
-    inline void InitProcessName();
     inline void SetupImGui(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags);
     inline void SetSetupImGuiCallback(SetupImGuiCallback callback);
     inline DWORD WINAPI MainThread(LPVOID lpParam);
     inline void Initialize(LPVOID lpParam);
 
-    // ==========================================
     // Cursor Hook Implementation
-    // ==========================================
     namespace cursorhook {
         inline int g_cursorShowCount = 0;
         inline HCURSOR g_lastCursor = nullptr;
@@ -393,9 +388,7 @@ namespace g_MDX12 {
         }
     }
 
-    // ==========================================
     // Raw Input Hook Implementation
-    // ==========================================
     namespace rawinputhook {
         inline UINT WINAPI hkGetRawInputData(HRAWINPUT hRawInput, UINT uiCommand, LPVOID pData, PUINT pcbSize, UINT cbSizeHeader) {
             if (g_MenuState::g_isOpen && g_InputState::g_blockMouseInput) {
@@ -466,9 +459,7 @@ namespace g_MDX12 {
         }
     }
 
-    // ==========================================
     // Window/Input Hook Implementation
-    // ==========================================
     namespace inputhook {
         inline WNDPROC sOriginalWndProc = nullptr;
         inline bool g_f1Down = false;
@@ -505,7 +496,7 @@ namespace g_MDX12 {
         }
 
         inline LRESULT APIENTRY WndProcHook(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-            // 【通用升级】如果当前正在录制任意按键（指针不为空）
+            // 如果当前正在录制任意按键（指针不为空）
             if (g_MenuState::g_pCurrentBindingKey != nullptr) {
                 if (uMsg == WM_KEYDOWN || uMsg == WM_SYSKEYDOWN) {
                     UINT vk = (UINT)wParam;
@@ -517,10 +508,10 @@ namespace g_MDX12 {
                             g_MenuState::g_pCurrentBindingKey = nullptr;
                         }
                         else {
-                            // 核心：直接向指针指向的内存写入捕获的原生虚拟键码！
+                            // 直接向指针指向的内存写入捕获的原生虚拟键码
                             *g_MenuState::g_pCurrentBindingKey = vk;
 
-                            g_MenuState::g_pCurrentBindingKey = nullptr; // 录制结束，清空指针
+                            g_MenuState::g_pCurrentBindingKey = nullptr;  // 录制结束，清空指针
                             g_MenuState::g_bindingFinished = true;        // 激活弹起保护
                         }
                         return 0; // 拦截，不响应游戏和 ImGui
@@ -532,7 +523,7 @@ namespace g_MDX12 {
                 }
             }
 
-            // 清除录制那一瞬间的按键弹起消息（保持不变）
+            // 清除录制那一瞬间的按键弹起消息
             if (g_MenuState::g_bindingFinished) {
                 if (uMsg == WM_KEYUP || uMsg == WM_SYSKEYUP) {
                     g_MenuState::g_bindingFinished = false;
@@ -652,50 +643,6 @@ namespace g_MDX12 {
         }
     }
 
-    // ==========================================
-    // Render and Cleanup Implementation
-    // ==========================================
-    inline void CleanupRenderResources() {
-        if (g_D3D12Resources::g_pd3dCommandQueue && g_D3D12Resources::g_fence && g_D3D12Resources::g_fenceEvent) {
-            UINT64 localFence = ++g_D3D12Resources::g_fenceValue;
-            HRESULT hr = g_D3D12Resources::g_pd3dCommandQueue->Signal(g_D3D12Resources::g_fence, localFence);
-
-            if (SUCCEEDED(hr)) {
-                if (g_D3D12Resources::g_fence->GetCompletedValue() < localFence) {
-                    g_D3D12Resources::g_fence->SetEventOnCompletion(localFence, g_D3D12Resources::g_fenceEvent);
-                    WaitForSingleObject(g_D3D12Resources::g_fenceEvent, g_InitState::g_waitTimeoutMs);
-                }
-            }
-        }
-
-        g_InitState::g_Initialized = false;
-
-        if (ImGui::GetCurrentContext()) {
-            ImGui_ImplDX12_InvalidateDeviceObjects();
-            ImGui_ImplDX12_Shutdown();
-            ImGui_ImplWin32_Shutdown();
-            ImGui::DestroyContext();
-        }
-
-        if (g_D3D12Resources::g_pd3dCommandList) { g_D3D12Resources::g_pd3dCommandList->Release(); g_D3D12Resources::g_pd3dCommandList = nullptr; }
-        if (g_D3D12Resources::g_pd3dRtvDescHeap) { g_D3D12Resources::g_pd3dRtvDescHeap->Release(); g_D3D12Resources::g_pd3dRtvDescHeap = nullptr; }
-        if (g_D3D12Resources::g_pd3dSrvDescHeap) { g_D3D12Resources::g_pd3dSrvDescHeap->Release(); g_D3D12Resources::g_pd3dSrvDescHeap = nullptr; }
-        if (g_D3D12Resources::g_fence) { g_D3D12Resources::g_fence->Release(); g_D3D12Resources::g_fence = nullptr; }
-        if (g_D3D12Resources::g_fenceEvent) { CloseHandle(g_D3D12Resources::g_fenceEvent); g_D3D12Resources::g_fenceEvent = nullptr; }
-
-        for (auto& frame : g_D3D12Resources::g_FrameContexts) {
-            if (frame.Resource) { frame.Resource->Release(); frame.Resource = nullptr; }
-            if (frame.CommandAllocator) { frame.CommandAllocator->Release(); frame.CommandAllocator = nullptr; }
-
-            frame.FenceValue = 0;
-        }
-
-        g_D3D12Resources::g_FrameContexts.clear();
-        g_D3D12Resources::g_bufferCount = 0;
-        rawinputhook::Remove();
-        cursorhook::Remove();
-    }
-
     inline void CleanupRenderResources_NoInput() {
         if (g_D3D12Resources::g_pd3dCommandQueue && g_D3D12Resources::g_fence && g_D3D12Resources::g_fenceEvent) {
             UINT64 localFence = ++g_D3D12Resources::g_fenceValue;
@@ -729,33 +676,7 @@ namespace g_MDX12 {
         g_InitState::g_Initialized = false;
     }
 
-    inline void FinalCleanupAll() {
-        std::lock_guard<std::mutex> lock(g_InitState::g_InitMutex);
-
-        if (g_InitState::g_Initialized) CleanupRenderResources();
-        if (g_D3D12Resources::g_pd3dCommandQueue && g_D3D12Resources::g_fence && g_D3D12Resources::g_fenceEvent) {
-            UINT64 localFence = ++g_D3D12Resources::g_fenceValue;
-            g_D3D12Resources::g_pd3dCommandQueue->Signal(g_D3D12Resources::g_fence, localFence);
-
-            if (g_D3D12Resources::g_fence->GetCompletedValue() < localFence) {
-
-                g_D3D12Resources::g_fence->SetEventOnCompletion(localFence, g_D3D12Resources::g_fenceEvent);
-                WaitForSingleObject(g_D3D12Resources::g_fenceEvent, INFINITE);
-            }
-        }
-
-        if (g_ProcessWindow::g_mainWindow) inputhook::Remove(g_ProcessWindow::g_mainWindow);
-        if (g_D3D12Resources::g_pd3dCommandQueue) { g_D3D12Resources::g_pd3dCommandQueue->Release(); g_D3D12Resources::g_pd3dCommandQueue = nullptr; }
-        if (g_D3D12Resources::g_pd3dDevice) { g_D3D12Resources::g_pd3dDevice->Release(); g_D3D12Resources::g_pd3dDevice = nullptr; }
-    }
-
-    inline void InitProcessName() {
-        // Implementation here
-    }
-
-    // ==========================================
     // Setup ImGui Callback Implementation
-    // ==========================================
     inline void SetSetupImGuiCallback(SetupImGuiCallback callback) {
         g_Callbacks::g_setupImGuiCallback = callback;
     }
@@ -767,9 +688,7 @@ namespace g_MDX12 {
         }
     }
 
-    // ==========================================
     // DX12 Hooks Implementation
-    // ==========================================
     inline void STDMETHODCALLTYPE hkExecuteCommandLists(ID3D12CommandQueue* queue, UINT NumCommandLists, ID3D12CommandList* const* ppCommandLists) {
         if (!g_D3D12Resources::g_pd3dCommandQueue && g_InitState::g_AfterFirstPresent && queue) {
             D3D12_COMMAND_QUEUE_DESC desc = queue->GetDesc();
@@ -895,8 +814,6 @@ namespace g_MDX12 {
                 // ImGui::StyleColorsClassic();
                 // ImGui::StyleColorsLight();
                 // ImGui::StyleColorsDark();
-                // ImGui::StyleColorsOcean();
-                // ImGui::StyleColorsShadow();
 
                 ImGui_ImplWin32_Init(g_ProcessWindow::g_mainWindow);
             }
@@ -916,17 +833,13 @@ namespace g_MDX12 {
             g_MDX12::g_Alibaba_PuHuiTi_Medium = io.Fonts->AddFontFromMemoryTTF(g_Fonts::Alibaba_PuHuiTi_Medium, sizeof(g_Fonts::Alibaba_PuHuiTi_Medium), 16.0f, NULL, range);
 
             // Alibaba-PuHuiTi-Bold
-            g_MDX12::g_Alibaba_PuHuiTi_Bold = io.Fonts->AddFontFromMemoryTTF(g_Fonts::Alibaba_PuHuiTi_Bold, sizeof(g_Fonts::Alibaba_PuHuiTi_Bold), 18.0f, NULL, range);
+            // g_MDX12::g_Alibaba_PuHuiTi_Bold = io.Fonts->AddFontFromMemoryTTF(g_Fonts::Alibaba_PuHuiTi_Bold, sizeof(g_Fonts::Alibaba_PuHuiTi_Bold), 18.0f, NULL, range);
 
             // Alibaba-PuHuiTi-Heavy
             // g_MDX12::g_Alibaba_PuHuiTi_Heavy = io.Fonts->AddFontFromMemoryTTF(g_Fonts::Alibaba_PuHuiTi_Heavy, sizeof(g_Fonts::Alibaba_PuHuiTi_Heavy), 18.0f, NULL, range);
 
             // Alibaba-PuHuiTi-Light
             // g_MDX12::g_Alibaba_PuHuiTi_Light = io.Fonts->AddFontFromMemoryTTF(g_Fonts::Alibaba_PuHuiTi_Light, sizeof(g_Fonts::Alibaba_PuHuiTi_Light), 18.0f, NULL, range);
-
-            g_MDX12::g_icomoon = io.Fonts->AddFontFromMemoryTTF(g_Fonts::icomoon, sizeof(g_Fonts::icomoon), 30.0f, NULL, atlas->GetGlyphRangesDefault());
-            g_MDX12::g_icomoon_small = io.Fonts->AddFontFromMemoryTTF(g_Fonts::icomoon, sizeof(g_Fonts::icomoon), 18.0f, NULL, atlas->GetGlyphRangesDefault());
-            g_MDX12::g_icomoon_big = io.Fonts->AddFontFromMemoryTTF(g_Fonts::icomoon, sizeof(g_Fonts::icomoon), 40.0f, NULL, atlas->GetGlyphRangesDefault());
 
             // DX12 后端必须重新初始化，因为 resize 可能会让之前的 backend 对象失效
             ImGui_ImplDX12_Init(g_D3D12Resources::g_pd3dDevice, g_D3D12Resources::g_bufferCount, desc.BufferDesc.Format, g_D3D12Resources::g_pd3dSrvDescHeap, g_D3D12Resources::g_pd3dSrvDescHeap->GetCPUDescriptorHandleForHeapStart(), g_D3D12Resources::g_pd3dSrvDescHeap->GetGPUDescriptorHandleForHeapStart());
@@ -1047,7 +960,7 @@ namespace g_MDX12 {
         }
 
         if (!g_RuntimeModules::WaitAndLoad()) {
-            // WaitAndLoad 目前是死循环直到成功，不会返回 false，此处作为保险
+            // WaitAndLoad 是死循环直到成功，不会返回 false
             return 0;
         }
 
@@ -1135,16 +1048,5 @@ namespace g_MDX12 {
     // Public API
     inline void Initialize(LPVOID lpParam) {
         MainThread(lpParam);
-    }
-}
-
-// Export C functions for external usage
-extern "C" {
-    inline __declspec(dllexport) void SetOverlayWaitTimeout(UINT ms) {
-        g_MDX12::g_InitState::g_waitTimeoutMs = ms;
-    }
-
-    inline __declspec(dllexport) void SetSetupImGuiCallback(g_MDX12::SetupImGuiCallback callback) {
-        g_MDX12::SetSetupImGuiCallback(callback);
     }
 }
