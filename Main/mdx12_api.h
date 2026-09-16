@@ -240,24 +240,25 @@ namespace g_MDX12 {
         }
 
         inline HCURSOR WINAPI hkSetCursor(HCURSOR hCursor) {
-            if (g_MenuState::g_isOpen) {
-                return g_HookFunctions::g_oSetCursor ? g_HookFunctions::g_oSetCursor(nullptr) : nullptr;
+            if (hCursor) {
+                g_lastCursor = hCursor;
             }
 
-            g_lastCursor = hCursor;
+            if (g_MenuState::g_isOpen) {
+                // 菜单开启期间，阻止游戏通过 SetCursor(NULL) 隐藏光标
+                if (hCursor == nullptr) {
+                    return nullptr;
+                }
+            }
+
             return g_HookFunctions::g_oSetCursor ? g_HookFunctions::g_oSetCursor(hCursor) : nullptr;
         }
 
         inline int WINAPI hkShowCursor(BOOL bShow) {
-            if (!g_MenuState::g_isOpen) {
-                g_cursorShowCount += bShow ? 1 : -1;
-            }
+            g_cursorShowCount += bShow ? 1 : -1;
 
             if (g_MenuState::g_isOpen) {
-                if (g_HookFunctions::g_oShowCursor) {
-                    while (g_HookFunctions::g_oShowCursor(FALSE) >= 0);
-                }
-                return -100;
+                return g_cursorShowCount;
             }
 
             return g_HookFunctions::g_oShowCursor ? g_HookFunctions::g_oShowCursor(bShow) : 0;
@@ -285,11 +286,15 @@ namespace g_MDX12 {
         inline void UpdateCursorState() {
             if (g_MenuState::g_isOpen) {
                 if (g_HookFunctions::g_oShowCursor) {
-                    while (g_HookFunctions::g_oShowCursor(FALSE) >= 0);
+                    while (g_HookFunctions::g_oShowCursor(TRUE) < 0);
                 }
 
                 if (g_HookFunctions::g_oClipCursor) {
                     g_HookFunctions::g_oClipCursor(nullptr);
+                }
+
+                if (g_HookFunctions::g_oSetCursor) {
+                    g_HookFunctions::g_oSetCursor(g_lastCursor ? g_lastCursor : LoadCursor(nullptr, IDC_ARROW));
                 }
             }
             else {
@@ -297,10 +302,18 @@ namespace g_MDX12 {
                     if (g_HookFunctions::g_oShowCursor) {
                         while (g_HookFunctions::g_oShowCursor(TRUE) < 0);
                     }
+
+                    if (g_HookFunctions::g_oSetCursor) {
+                        g_HookFunctions::g_oSetCursor(g_lastCursor ? g_lastCursor : LoadCursor(nullptr, IDC_ARROW));
+                    }
                 }
                 else {
                     if (g_HookFunctions::g_oShowCursor) {
                         while (g_HookFunctions::g_oShowCursor(FALSE) >= 0);
+                    }
+
+                    if (g_HookFunctions::g_oSetCursor) {
+                        g_HookFunctions::g_oSetCursor(nullptr);
                     }
                 }
             }
@@ -351,6 +364,10 @@ namespace g_MDX12 {
             }
             else {
                 GetCursorPos(&g_lastReportedPos);
+            }
+
+            if (!g_lastCursor) {
+                g_lastCursor = LoadCursor(nullptr, IDC_ARROW);
             }
 
             MH_EnableHook(MH_ALL_HOOKS);
@@ -473,13 +490,6 @@ namespace g_MDX12 {
                 GetClassNameA(foreground, className, sizeof(className));
             }
 
-            std::unordered_set<std::string> menuClasses = {
-                "#32770",
-                "ConsoleWindowClass",
-                "Edit",
-                "ListBox",
-            };
-
             bool gameHasMenuOpen = false;
 
             if (foreground && foreground != g_ProcessWindow::g_mainWindow) {
@@ -548,6 +558,8 @@ namespace g_MDX12 {
                         else GetCursorPos(&p);
                         ScreenToClient(hwnd, &p);
                         io.MousePos = ImVec2((float)p.x, (float)p.y);
+                        io.MouseDrawCursor = false;
+                        io.ConfigFlags &= ~ImGuiConfigFlags_NoMouseCursorChange;
                     }
                     else {
                         // 关闭菜单时：将 ImGui 的鼠标坐标移出屏幕，防止关闭瞬间 ImGui 还在触发 Hover 状态导致系统光标视觉撕裂
@@ -555,6 +567,8 @@ namespace g_MDX12 {
                         for (int i = 0; i < ImGuiMouseButton_COUNT; i++) {
                             io.MouseDown[i] = false;
                         }
+                        io.MouseDrawCursor = false;
+                        io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
                     }
                 }
 
@@ -576,6 +590,17 @@ namespace g_MDX12 {
             }
 
             if (g_MenuState::g_isOpen && ImGui::GetCurrentContext() != nullptr) {
+                if (uMsg == WM_SETCURSOR) {
+                    if (LOWORD(lParam) == HTCLIENT) {
+                        if (ImGui_ImplWin32_WndProcHandler(hwnd, uMsg, wParam, lParam)) {
+                            return TRUE;
+                        }
+                        SetCursor(cursorhook::g_lastCursor ? cursorhook::g_lastCursor : LoadCursor(nullptr, IDC_ARROW));
+                        return TRUE;
+                    }
+                    return DefWindowProc(hwnd, uMsg, wParam, lParam);
+                }
+
                 ImGui_ImplWin32_WndProcHandler(hwnd, uMsg, wParam, lParam);
                 ImGuiIO& io = ImGui::GetIO();
 
@@ -663,6 +688,8 @@ namespace g_MDX12 {
         if (g_D3D12Resources::g_pd3dCommandList) { g_D3D12Resources::g_pd3dCommandList->Release(); g_D3D12Resources::g_pd3dCommandList = nullptr; }
         if (g_D3D12Resources::g_pd3dRtvDescHeap) { g_D3D12Resources::g_pd3dRtvDescHeap->Release(); g_D3D12Resources::g_pd3dRtvDescHeap = nullptr; }
         if (g_D3D12Resources::g_pd3dSrvDescHeap) { g_D3D12Resources::g_pd3dSrvDescHeap->Release(); g_D3D12Resources::g_pd3dSrvDescHeap = nullptr; }
+        if (g_D3D12Resources::g_fence) { g_D3D12Resources::g_fence->Release(); g_D3D12Resources::g_fence = nullptr; }
+        if (g_D3D12Resources::g_fenceEvent) { CloseHandle(g_D3D12Resources::g_fenceEvent); g_D3D12Resources::g_fenceEvent = nullptr; }
 
         for (auto& frame : g_D3D12Resources::g_FrameContexts) {
             if (frame.Resource) { frame.Resource->Release(); frame.Resource = nullptr; }
@@ -882,25 +909,22 @@ namespace g_MDX12 {
         ID3D12DescriptorHeap* ppHeaps[] = { g_D3D12Resources::g_pd3dSrvDescHeap };
         g_D3D12Resources::g_pd3dCommandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 
-        ImGui_ImplDX12_NewFrame();
-        ImGui_ImplWin32_NewFrame();
-        ImGui::NewFrame();
-
         ImGuiIO& io = ImGui::GetIO();
-        bool cursorStateChanged = (g_MenuState::g_isOpen != g_MenuState::g_wasOpenLastFrame);
-
         g_MenuState::g_wasOpenLastFrame = g_MenuState::g_isOpen;
         inputhook::UpdateInputBlockState();
         cursorhook::UpdateCursorState();
 
+        io.MouseDrawCursor = false;
         if (g_MenuState::g_isOpen) {
-            io.MouseDrawCursor = true;
             io.ConfigFlags &= ~ImGuiConfigFlags_NoMouseCursorChange;
         }
         else {
-            io.MouseDrawCursor = false;
             io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
         }
+
+        ImGui_ImplDX12_NewFrame();
+        ImGui_ImplWin32_NewFrame();
+        ImGui::NewFrame();
 
         SetupImGui(pSwapChain, SyncInterval, Flags);
         ImGui::Render();
@@ -934,9 +958,7 @@ namespace g_MDX12 {
         DXGI_FORMAT NewFormat,
         UINT SwapChainFlags)
     {
-        if (!g_InitState::g_Initialized) {
-            std::lock_guard<std::mutex> lock(g_InitState::g_InitMutex);
-        }
+        std::lock_guard<std::mutex> lock(g_InitState::g_InitMutex);
 
         if (g_InitState::g_Initialized) {
             CleanupRenderResources_NoInput();
