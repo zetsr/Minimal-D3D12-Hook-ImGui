@@ -2,29 +2,18 @@
 
 一个轻量级的 DirectX 12 钩子库，仅需包含一个头文件即可通过回调函数运行 ImGui。
 
-<img width="733" height="521" alt="image" src="https://github.com/user-attachments/assets/7cfb4b79-6746-4bc2-a0b0-82f5cd11620c" />
-
 ## 快速开始
 
 ### 1. 项目配置
 
-在项目中包含必要的头文件和库：
+在项目中包含头文件：
 
 ```cpp
 #include "mdx12_api.h"
 ```
+### 2. 开始使用
 
-确保以下文件包含在你的项目中：
-- `mdx12_api.h` - 主 API 头文件
-- `mdx12_globals.cpp` - 全局变量定义
-- `hooks.cpp` - D3D12 Hook 实现
-- `input.cpp` - 输入处理
-- `render.cpp` - 渲染资源管理
-- `setup_imgui.cpp` - ImGui 集成
-
-### 2. 基本使用
-
-在 `dllmain.cpp` 中编写你的代码：
+在 `dllmain.cpp` 中编写你的业务代码：
 
 ```cpp
 #include "mdx12_api.h"
@@ -78,7 +67,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 
 ## 致谢
 
-- [ImGui](https://github.com/ocornut/imgui)
+- [Dear ImGui](https://github.com/ocornut/imgui)
 - [MinHook](https://github.com/TsudaKageyu/minhook)
 - [Universal-Dear-ImGui-Hook](https://github.com/Sh0ckFR/Universal-Dear-ImGui-Hook)
 
