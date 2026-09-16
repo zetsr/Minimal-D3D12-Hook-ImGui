@@ -1038,7 +1038,14 @@ namespace g_MDX12 {
     }
 
     inline DWORD WINAPI MainThread(LPVOID lpParam) {
-        if (MH_Initialize() != MH_OK) return 0;
+        // 初始化 MinHook
+        MH_STATUS mhStatus = MH_Initialize();
+
+        // 检查初始化状态，如果失败且不是已经初始化的状态，则返回
+        if (mhStatus != MH_OK && mhStatus != MH_ERROR_ALREADY_INITIALIZED) {
+            return 0;
+        }
+
         if (!g_RuntimeModules::WaitAndLoad()) {
             // WaitAndLoad 目前是死循环直到成功，不会返回 false，此处作为保险
             return 0;
