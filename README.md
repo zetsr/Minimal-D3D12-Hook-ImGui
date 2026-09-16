@@ -18,23 +18,12 @@
 在 `dllmain.cpp` 中编写你的业务代码：
 
 ```cpp
+#include <windows.h>
 #include "mdx12_api.h"
 
-/// 定义自定义 ImGui 绘制函数
-void MyImGuiDraw(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags)
-{
-    // 检查菜单是否打开（按 F1 切换）
+void MyImGuiDraw(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags) {
     if (g_MDX12::g_MenuState::g_isOpen) {
-        ImGui::SetNextWindowPos(ImVec2(100, 100), ImGuiCond_FirstUseEver);
-        ImGui::SetNextWindowSize(ImVec2(400, 300), ImGuiCond_FirstUseEver);
-
-        if (ImGui::Begin("My Menu")) {
-            ImGui::Text("Hello World!");
-
-            static bool option = false;
-            ImGui::Checkbox("My Option", &option);
-        }
-        ImGui::End();
+		ImGui::ShowDemoWindow(nullptr);
     }
 }
 
@@ -52,11 +41,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
     switch (ul_reason_for_call) {
     case DLL_PROCESS_ATTACH:
         if (HANDLE h = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)MainThread, hModule, 0, nullptr)) CloseHandle(h);
-        break;
-
-    case DLL_PROCESS_DETACH:
-        // 清理资源
-        g_MDX12::FinalCleanupAll();
         break;
     }
     return TRUE;

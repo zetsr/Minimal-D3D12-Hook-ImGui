@@ -22,11 +22,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
     case DLL_PROCESS_ATTACH:
         if (HANDLE h = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)MainThread, hModule, 0, nullptr)) CloseHandle(h);
         break;
-
-    case DLL_PROCESS_DETACH:
-        // 清理资源
-        // g_MDX12::FinalCleanupAll();
-        break;
     }
     return TRUE;
 }
