@@ -1,144 +1,123 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="ImGui">
-      <UniqueIdentifier>{7ff4ae78-cef1-4d82-a968-54bfcc0b7eec}</UniqueIdentifier>
+    <Filter Include="Minimal-D3D12-Hook-ImGui">
+      <UniqueIdentifier>{46c940c6-a5cd-4479-99e3-de56d1242b52}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MinHook">
-      <UniqueIdentifier>{5028b4a0-6bc5-42c6-a2ac-99d0040b7242}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Main">
-      <UniqueIdentifier>{87af0a0c-3a68-428d-b49c-00a3e78d8e55}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="MinHook\include">
-      <UniqueIdentifier>{7045de8d-8567-4cf9-9c96-88ad38f53f6a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Font">
+    <Filter Include="Minimal-D3D12-Hook-ImGui\Font">
       <UniqueIdentifier>{2ac084e4-933e-457e-8dc8-1b70aca23201}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MinHook\src">
+    <Filter Include="Minimal-D3D12-Hook-ImGui\ImGui">
+      <UniqueIdentifier>{7ff4ae78-cef1-4d82-a968-54bfcc0b7eec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Minimal-D3D12-Hook-ImGui\Main">
+      <UniqueIdentifier>{87af0a0c-3a68-428d-b49c-00a3e78d8e55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Minimal-D3D12-Hook-ImGui\MinHook">
+      <UniqueIdentifier>{5028b4a0-6bc5-42c6-a2ac-99d0040b7242}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Minimal-D3D12-Hook-ImGui\MinHook\include">
+      <UniqueIdentifier>{7045de8d-8567-4cf9-9c96-88ad38f53f6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Minimal-D3D12-Hook-ImGui\MinHook\src">
       <UniqueIdentifier>{9382e930-f188-440f-84d4-4ceaeec2fbf6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MinHook\src\hde">
+    <Filter Include="Minimal-D3D12-Hook-ImGui\MinHook\src\hde">
       <UniqueIdentifier>{24617045-5916-4258-844c-a8f9b56acfd1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
-      <Filter>ImGui</Filter>
+      <Filter>Minimal-D3D12-Hook-ImGui\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="ImGui\imgui.h">
-      <Filter>ImGui</Filter>
+      <Filter>Minimal-D3D12-Hook-ImGui\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="ImGui\imgui_impl_dx12.h">
-      <Filter>ImGui</Filter>
+      <Filter>Minimal-D3D12-Hook-ImGui\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="ImGui\imgui_impl_win32.h">
-      <Filter>ImGui</Filter>
+      <Filter>Minimal-D3D12-Hook-ImGui\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="ImGui\imgui_internal.h">
-      <Filter>ImGui</Filter>
+      <Filter>Minimal-D3D12-Hook-ImGui\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="ImGui\imstb_rectpack.h">
-      <Filter>ImGui</Filter>
+      <Filter>Minimal-D3D12-Hook-ImGui\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="ImGui\imstb_textedit.h">
-      <Filter>ImGui</Filter>
+      <Filter>Minimal-D3D12-Hook-ImGui\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="ImGui\imstb_truetype.h">
-      <Filter>ImGui</Filter>
+      <Filter>Minimal-D3D12-Hook-ImGui\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="MinHook\include\MinHook.h">
-      <Filter>MinHook\include</Filter>
-    </ClInclude>
-    <ClInclude Include="Font\Alibaba-PuHuiTi-Medium.h">
-      <Filter>Font</Filter>
+      <Filter>Minimal-D3D12-Hook-ImGui\MinHook\include</Filter>
     </ClInclude>
     <ClInclude Include="Main\mdx12_api.h">
-      <Filter>Main</Filter>
+      <Filter>Minimal-D3D12-Hook-ImGui\Main</Filter>
     </ClInclude>
     <ClInclude Include="MinHook\src\buffer.h">
-      <Filter>MinHook\src</Filter>
+      <Filter>Minimal-D3D12-Hook-ImGui\MinHook\src</Filter>
     </ClInclude>
     <ClInclude Include="MinHook\src\trampoline.h">
-      <Filter>MinHook\src</Filter>
+      <Filter>Minimal-D3D12-Hook-ImGui\MinHook\src</Filter>
     </ClInclude>
     <ClInclude Include="MinHook\src\hde\hde32.h">
-      <Filter>MinHook\src\hde</Filter>
+      <Filter>Minimal-D3D12-Hook-ImGui\MinHook\src\hde</Filter>
     </ClInclude>
     <ClInclude Include="MinHook\src\hde\hde64.h">
-      <Filter>MinHook\src\hde</Filter>
+      <Filter>Minimal-D3D12-Hook-ImGui\MinHook\src\hde</Filter>
     </ClInclude>
     <ClInclude Include="MinHook\src\hde\pstdint.h">
-      <Filter>MinHook\src\hde</Filter>
+      <Filter>Minimal-D3D12-Hook-ImGui\MinHook\src\hde</Filter>
     </ClInclude>
     <ClInclude Include="MinHook\src\hde\table32.h">
-      <Filter>MinHook\src\hde</Filter>
+      <Filter>Minimal-D3D12-Hook-ImGui\MinHook\src\hde</Filter>
     </ClInclude>
     <ClInclude Include="MinHook\src\hde\table64.h">
-      <Filter>MinHook\src\hde</Filter>
-    </ClInclude>
-    <ClInclude Include="Font\icomoon.h">
-      <Filter>Font</Filter>
+      <Filter>Minimal-D3D12-Hook-ImGui\MinHook\src\hde</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ImGui\imgui.cpp">
-      <Filter>ImGui</Filter>
+      <Filter>Minimal-D3D12-Hook-ImGui\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="ImGui\imgui_demo.cpp">
-      <Filter>ImGui</Filter>
+      <Filter>Minimal-D3D12-Hook-ImGui\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="ImGui\imgui_draw.cpp">
-      <Filter>ImGui</Filter>
+      <Filter>Minimal-D3D12-Hook-ImGui\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="ImGui\imgui_impl_dx12.cpp">
-      <Filter>ImGui</Filter>
+      <Filter>Minimal-D3D12-Hook-ImGui\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="ImGui\imgui_impl_win32.cpp">
-      <Filter>ImGui</Filter>
+      <Filter>Minimal-D3D12-Hook-ImGui\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="ImGui\imgui_tables.cpp">
-      <Filter>ImGui</Filter>
+      <Filter>Minimal-D3D12-Hook-ImGui\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="ImGui\imgui_widgets.cpp">
-      <Filter>ImGui</Filter>
+      <Filter>Minimal-D3D12-Hook-ImGui\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="Main\dllmain.cpp">
-      <Filter>Main</Filter>
-    </ClCompile>
-    <ClCompile Include="Main\input.cpp">
-      <Filter>Main</Filter>
-    </ClCompile>
-    <ClCompile Include="Main\render.cpp">
-      <Filter>Main</Filter>
-    </ClCompile>
-    <ClCompile Include="Main\setup_imgui.cpp">
-      <Filter>Main</Filter>
-    </ClCompile>
-    <ClCompile Include="Main\mdx12_libs.cpp">
-      <Filter>Main</Filter>
-    </ClCompile>
-    <ClCompile Include="Main\mdx12_globals.cpp">
-      <Filter>Main</Filter>
-    </ClCompile>
-    <ClCompile Include="Main\hooks.cpp">
-      <Filter>Main</Filter>
+      <Filter>Minimal-D3D12-Hook-ImGui\Main</Filter>
     </ClCompile>
     <ClCompile Include="MinHook\src\buffer.c">
-      <Filter>MinHook\src</Filter>
+      <Filter>Minimal-D3D12-Hook-ImGui\MinHook\src</Filter>
     </ClCompile>
     <ClCompile Include="MinHook\src\hook.c">
-      <Filter>MinHook\src</Filter>
+      <Filter>Minimal-D3D12-Hook-ImGui\MinHook\src</Filter>
     </ClCompile>
     <ClCompile Include="MinHook\src\trampoline.c">
-      <Filter>MinHook\src</Filter>
+      <Filter>Minimal-D3D12-Hook-ImGui\MinHook\src</Filter>
     </ClCompile>
     <ClCompile Include="MinHook\src\hde\hde32.c">
-      <Filter>MinHook\src\hde</Filter>
+      <Filter>Minimal-D3D12-Hook-ImGui\MinHook\src\hde</Filter>
     </ClCompile>
     <ClCompile Include="MinHook\src\hde\hde64.c">
-      <Filter>MinHook\src\hde</Filter>
+      <Filter>Minimal-D3D12-Hook-ImGui\MinHook\src\hde</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
