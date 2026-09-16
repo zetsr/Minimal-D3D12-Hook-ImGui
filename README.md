@@ -2,6 +2,8 @@
 
 一个轻量级的 DirectX 12 钩子库，仅需包含一个头文件即可通过回调函数运行 ImGui。
 
+<img width="1919" height="998" alt="image" src="https://github.com/user-attachments/assets/33e23a19-bc52-4027-8059-3c3af84a4cd9" />
+
 ## 快速开始
 
 ### 1. 项目配置
@@ -74,7 +76,3 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 > 最后，感谢 *Large Language Model*，它帮助我实现了无数个在此之前难以实现的梦想：
 >
 > **做更多有用的东西，让更多人使用。**
-
-## 许可证
-
-该项目遵循其依赖库的许可证。详见各库的许可证文件。
